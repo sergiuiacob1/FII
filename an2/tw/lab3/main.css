@@ -1,0 +1,12 @@
+.event-info{
+    border: 3px solid black;
+}
+
+.event-info img, .event-info .dates, .event-info h1, .event-info .description{
+    display: inline-block;
+    padding: 2%;
+}
+
+.event-info img{
+    vertical-align: middle;
+}

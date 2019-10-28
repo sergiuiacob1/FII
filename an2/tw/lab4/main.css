@@ -1,0 +1,43 @@
+.top-menu{
+    background-color: black;
+    width: 100%;
+    height: 5%;
+    position: fixed;
+}
+
+#buton{
+    border: 2px solid white;
+    border-radius: 3px;
+    text-align: center;
+    position: absolute;
+    margin-left: 1%;
+    margin-top: 0.5%;
+    background-color: black;
+    color: white;
+}
+
+.left-menu{
+    position: fixed;
+    background: black;
+    height: 100%;
+    width: 25%;
+}
+
+.left-menu #buton{
+    right: 3%;
+    top: 1%;
+}
+
+.left-menu ul{
+    color: white;
+    margin-top: 25%;
+    margin-left: 25%;
+}
+
+.left-menu ul li{
+    padding: 10px;
+}
+
+.hide{
+    left: -25%;
+}

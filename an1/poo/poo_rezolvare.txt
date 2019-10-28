@@ -1,0 +1,128 @@
+0722 684 012
+mihail.dancescu@spitalulsfconstantin.ro
+3500 8500
+
+
+#include<iostream>
+#include<string>
+#include<vector>
+using namespace std;
+
+class Message
+{
+public:
+	virtual void Afiseaza() = 0;
+	virtual void Attach(Message* m) = 0;
+	virtual int GetX() = 0;
+	virtual int GetY() = 0;
+	virtual string GetContent() = 0;
+};
+
+class Sticker : public Message
+{
+private:
+	int x;
+	int y;
+	string text;
+	string culoare;
+	vector<Message*>alte_mesaje;
+	Message* parinte;
+
+public:
+	Sticker(Message* parinte_, int x_, int y_, string text_, string culoare_)
+	{
+		this->parinte = parinte_;
+		x = x_;
+		y = y_;
+		text = text_;
+		culoare = culoare_;
+
+		alte_mesaje.clear();
+	}
+
+	void Afiseaza()
+	{
+		cout << text << " " << culoare << " " << x << " " << y << " " << alte_mesaje.size() << " ";
+
+		if (parinte != NULL)
+			cout << parinte->GetContent() << endl;
+		else
+			cout << "-" << endl;
+
+		for (auto it = alte_mesaje.begin(); it != alte_mesaje.end(); it++)
+			(*it)->Afiseaza();
+	}
+	int GetX() { return x; }
+	int GetY() { return y; }
+	string GetContent() { return text; }
+	void Attach(Message *m) { alte_mesaje.push_back(m); }
+
+};
+
+class WhiteBoard : public Message
+{
+private:
+	int x;
+	int y;
+	string text;
+	string culoare;
+	vector<Message*>alte_mesaje;
+	Message* parinte;
+
+public:
+	WhiteBoard(Message* parinte_, int x_, int y_, string text_, string culoare_)
+	{
+		this->parinte = parinte_;
+		x = x_;
+		y = y_;
+		text = text_;
+		culoare = culoare_;
+
+		alte_mesaje.clear();
+	}
+
+	void Afiseaza()
+	{
+		cout << text << " " << culoare << " " << x << " " << y << " " << alte_mesaje.size() << " ";
+
+		if (parinte != NULL)
+			cout << parinte->GetContent() << endl;
+		else
+			cout << "-" << endl;
+
+		for (auto it = alte_mesaje.begin(); it != alte_mesaje.end(); it++)
+			(*it)->Afiseaza();
+	}
+	int GetX() { return x; }
+	int GetY() { return y; }
+	string GetContent() { return text; }
+	void Attach(Message *m) { alte_mesaje.push_back(m); }
+
+};
+
+int main(void) 
+{
+	Message *wall = new WhiteBoard(0, 0, 0, "MindMap", "violet"); 
+	Message *stick1 = new Sticker(wall, 10, 10, "Vacanta", "rosu"); 
+	Message *stick2 = new Sticker(wall, 10, 50, "Munte", "albastru"); 
+	Message *stick3 = new Sticker(wall, 50, 10, "Tabara", "roz"); 
+	Message *stick4 = new Sticker(wall, 50, 50, "Examen PA", "rosu inchis"); 
+	Message *stick5 = new Sticker(wall, 150, 10, "Examen POO", "maro"); 
+	Message *stick6 = new Sticker(wall, 100, 10, "Familie", "galben"); 
+	Message *stick7 = new Sticker(stick6, 20, 30, "Iesire la Ciric", "verde"); 
+	Message *stick8 = new Sticker(stick7, 20, 20, "Gratar", "rosu aprins");
+	
+	wall->Attach(stick1); 
+	wall->Attach(stick2); 
+	wall->Attach(stick3);
+	wall->Attach(stick4);
+	wall->Attach(stick5); 
+	wall->Attach(stick6); 
+	stick6->Attach(stick7);
+	stick7->Attach(stick8);
+
+
+	wall->Afiseaza();
+	system("pause");
+	return 0;
+}

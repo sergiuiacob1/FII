@@ -1,0 +1,13 @@
+corect
+"acade!1003!!!!a!!24!!acv!!!!"
+"107!!!1000!!1090!!!0!"
+"100!!!"
+"abc!"
+"a!!abc!!!acdef!acv!!!!"
+incorect
+!!!abc!abcde!
+"!010!"
+"02!"
+"abcd!!ab"
+"0"
+"abcdeaa!!"

@@ -1,0 +1,9 @@
+x :- true;
+y :- false;
+result := 0;
+
+while (x or y)
+{
+    result := result + 1;
+    x :- false;
+}

@@ -1,0 +1,36 @@
+Iacob Sergiu, B1
+Exercitiul 1
+
+# Cream un user nou
+sudo adduser testuser
+# Il facem sudo
+sudo usermod -aG sudo testuser
+# Ne logam cu acest user
+su - testuser
+# Aflam unde e fisierul pt passwd
+which passwd
+ls -l /usr/bin/passwd
+# Inainte de remove:
+# -rwsr-xr-x 1 root root 59640 Jan 25  2018 /usr/bin/passwd
+# Remove SetUID bit
+sudo chmod u-s /usr/bin/passwd
+ls -l /usr/bin/passwd
+# Dupa remove:
+# -rwxr-xr-x 1 root root 59640 Jan 25  2018 /usr/bin/passwd
+
+# Dam remove la sudo pt testuser
+sudo deluser testuser sudo
+# Incercam sa rulam passwd de pe un user care nu e user
+passwd
+# Eroare: Authentication token manipulation error
+# Login as root
+su -
+# Setam capabilitatile necesare pentru comanda
+# Trebuie sa putem crea fisierul /etc/nshadow, sa suprascriem /etc/shadow, sa putem modifica ownerul unui fisier
+# CAP_CHOWN: sa mutem sa modificam /etc/shadow, deoarece acest fisier este doar accesibil pentru root
+# CAP_DAC_OVERRIDE: "Bypass file read, write, and execute permission checks."
+# CAP_FOWNER: "Bypass permission checks on operations that normally require the file system UID of the process to match the UID of the file"
+sudo setcap CAP_CHOWN,CAP_DAC_OVERRIDE,CAP_FOWNER+ep testuser
+su - testuser
+passwd
+# Acum functioneaza

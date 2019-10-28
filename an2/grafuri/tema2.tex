@@ -1,0 +1,216 @@
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+
+\usepackage{amssymb}
+\usepackage{tikz}
+
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+\title{Tema 2}
+\author{Vintur Cristian B4 \and Iacob Sergiu B1}
+\date{\normalsize\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Problema 1}
+\subsection{•}
+
+\paragraph{•}
+Presupunem, prin reducere la absurd, ca exista un arbore partial $T' \neq T^*$, de cost mai mic sau egal cu $T^*$ in raport cu functia $\overline{c}$.
+
+Notam cu $cost(T, c)$ - costul arborelui partial T in raport cu functia c.
+
+Din definitia functiei $\overline{c}$, avem $cost(T^*, \overline{c}) = cost(T^*, c) - (n - 1) \epsilon$
+
+Dar $cost(T', \overline{c}) = cost(T', c) - x \epsilon > cost(T', c) - (n - 1) \epsilon$, unde x reprezinta numarul de muchii din T' care apar in $T^*$ ($x < n - 1$ deoarece $T' \neq T^*$)
+
+Avem $cost(T', c) - (n - 1) \epsilon < cost(T', \overline{c}) \leqslant cost(T^*, \overline{c}) = cost(T^*, c) - (n - 1) \epsilon$
+
+Rezulta $cost(T', c) < cost(T^*, c)$, deci $T^*$ nu este arbore partial de cost minim in G in raport cu functia c (contradictie)
+
+Rezulta ca nu exista un arbore partial T' de cost cel putin la fel de bun ca $T^*$ in raport cu $\overline{c}$, deci $T^*$ este unicul arbore partial de cost minim in raport cu $\overline{c}$
+
+\subsection{•}
+
+\paragraph{•}
+Consideram functia $\overline{c}$ de la punctul a) pentru un $\epsilon < max\left(\left|c(e)-c(e')\right|\right), e, e' \in E, c(e) \neq c(e')$
+
+Ordonam muchiile in raport cu functia $\overline{c}$ (in caz de egalitate in orice ordine).
+
+Observam ca ordonarea este valida si in raport cu functia c. In caz contrar, ar exista doua muchii e si e' pentru care $\overline{c}(e) \leqslant \overline{c}(e)$ si $c(e) > c(e')$. Singura posibilitate pentru ca acest lucru sa se intample este $\overline{c}(e)=c(e)-\epsilon$ si $\overline{c}(e')=c(e')$. Atunci $c(e)-\epsilon <c(e')\iff \epsilon >c(e)-c(e')=\left| c(e)-c(e')\right| $. Contradictie cu definitia lui $\epsilon$
+
+Deoarece $T^*$ este unicul arbore partial de cost minim in raport cu $\overline{c}$, algoritmul lui Kruskal va returna $T^*$ pentru aceasta ordonare.
+
+\newpage
+\section{Problema 2}
+
+\subsection{•}
+\paragraph{•}
+Notam $d_{sv} = \min{(a(P))}$, pentru orice $P$ drum de la $s$ la $v$.
+
+Important de observat este faptul ca pentru orice mers M de la $s$ la un $v$ oarecare avem $a(M) \geqslant d_{sv}$. Intr-adevar, daca eliminam toate circuitele din M (posibil niciunul), obtinem un drum P de la s la v. Costul acestuia este mai mic sau egal cu cel al lui M, deoarece toate circuitele eliminate au costul nenegativ. Din definitia lui $d_{sv}$ obtinem $a(M) \geqslant a(P) \geqslant d_{sv}$.
+
+Fie circuitul $C$ cu $a(C) = 0$. Dintre toate nodurile din C, consideram nodul u pentru care $d_{su}$ este minim. Construim mersul, notat cu Q, urmator: consideram drumul minim de la s la u apoi mergem pe circuitul C cat timp mersul are lungimea mai mica decat n. Fie v nodul la care ne-am oprit si Q.
+
+Sa consideram $C_{uv}$ costul drumului de la $u$ la $v$ in interiorul circuitului $C$.
+
+Descompunem mersul Q astfel: drumul de la s la u, un numar de k circuite complete ale lui C, $k \geqslant 0$, mersul de la u la v pe circuit. Avem: $a(Q)=d_{su} + k \times a(C) + C_{uv} = d_{su} + C_{uv} \Rightarrow a(Q)=d_{su}+C_{uv} \quad (1)$
+
+%Stim ca $P$ are cost minim. Aratam ca nu poate exista un drum care sa minimizeze costul de pe drumul de la $u$ la $v$.
+
+
+\begin{tikzpicture}
+\def \n {7}
+\def \radius {3cm}
+\def \margin {8} % margin in angles, depends on the radius
+
+\foreach \s in {1,...,\n}
+{
+  \node[draw, circle] at ({360/\n * (\s - 1)}:\radius) {$   $};
+  \draw[->, >=latex] ({360/\n * (\s - 1)+\margin}:\radius) 
+    arc ({360/\n * (\s - 1)+\margin}:{360/\n * (\s)-\margin}:\radius);
+}
+
+\node at ({360/\n * (1 - 1)}:\radius) {$u$};
+\node at ({360/\n * (4 - 1)}:\radius) {$v$};
+\node[draw, circle] at ({360/\n * (1 - 1)}: 7) {$s$};
+
+\draw [->] (6.6, 0) -- (3.5, 0);
+\end{tikzpicture}
+
+%Sa consideram $C_{uv}$ costul drumului de la $u$ la $v$ in interiorul circuitului $C$. Sa presupunem prin reducere la absurd ca ar exista un drum $D$ intre $u$ si $v$ care ar putea minimiza costul $C_{uv}$. Deducem ca s-ar putea forma un circuit $C'$, plecand de la $C$, ce foloseste drumul $D$, cu $a(C')$ negativ (deoarece $D$ ar scadea costul circuitului), ceea ce contrazice ipoteza (nu avem circuite de cost negativ).
+%\paragraph{•}
+%Avem, asadar, $C_{uv}$ = costul minim al unui drum de la $u$ la $v$.
+%\paragraph{•}
+
+Pp. prin reducere la absurd ca $d_{sv} < d_{su} + C_{uv} \quad (2)$. Avem $d_{su} \leqslant d_{sv} + C_{vu} \quad (3)$. Inlocuind $(3)$ in $(2)$, obtinem $d_{sv} < d_{sv} + C_{vu} + C_{uv}$. Dar $C_{vu} + C_{uv} = 0$, deci $d_{sv} <d_{sv}$ contradictie. Avem deci $d_{sv} \geqslant d_{su} + C_{uv}$. Asta inseamna ca $d_{sv} = d_{su} + C_{uv}$.
+
+\paragraph{•}
+Am obtinut faptul ca $a(Q) = d_{su} + C_{uv} = d_{sv}$. Deoarece niciun mers nu poate fi mai bun decat drumul minim, rezulta $a(Q)=A_n(v)$, deci $A_n(v)=d_{sv}$.
+
+
+\subsection{•}
+
+\paragraph{•}
+Conditia $(a_{avg})^*=0$ se traduce prin: exista un circuit C cu $a_{avg}(C)=0\iff a(C)=0$ si nu exista niciun circuit de cost negativ.
+
+Consideram un nod u oarecare si P un drum de cost minim de la s la u. Fie $0 \leqslant l=lg(P) \leqslant n-1$. Avem $a(P)=A_l(u)$ si $A_n(u) \geqslant a(P)$, deci
+
+\begin{center}
+$\frac{A_n(u)-A_l(u)}{n-l} \geqslant \frac{a(P)-a(P)}{n-l} = 0 \Rightarrow \max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(u)-A_k(u)}{n-k} \geqslant 0, \forall u \in V \quad (4)$
+\end{center}
+
+\begin{center}
+$\min\limits_{u \in V}\max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(u)-A_k(u)}{n-k} \geqslant 0 \quad (5)$
+\end{center}
+
+Folosind rezultatul de la punctul a), exista un nod v pentru care $A_n(v)=d_{sv}$.
+
+Pentru orice $0 \leqslant k \leqslant n-1$, avem
+
+\begin{center}
+$d_{sv} \leqslant A_k(v) \iff \frac{A_n(v)-A_k(v)}{n-k} \leqslant 0, \forall 0 \leqslant k \leqslant n-1$
+\end{center}
+
+Rezulta
+
+\begin{center}
+$\max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(v)-A_k(v)}{n-k} \leqslant 0$
+\end{center}
+
+Folosind relatia (4), obtinem $\max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(v)-A_k(v)}{n-k}=0$, deci in relatia (5), minimul se atinge, adica:
+
+\begin{center}
+$\min\limits_{u \in V}\max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(u)-A_k(u)}{n-k} =0$
+\end{center}
+
+\subsection{•}
+\paragraph{•}
+Construim functia de cost $a' :E \rightarrow R$ pe arce, a.i. $a'(e) = a(e) - (a_{avg})^*$, oricare ar fi functia de cost $a$. Deducem ca pentru orice varf $v$, avem $A'_k(v) = A_k(v) - k(a_{avg})^*$. Analog, pentru un circuit $C$ avem ${a'}_{avg}(C) = \frac{a'(C)}{lg(C)} = \frac{a(C) - lg(C)(a_{avg})^*}{lg(C)} = \frac{a(C)}{lg(C)} - (a_{avg})^* = a_{avg}(C) - (a_{avg})^*$
+
+Conform relatiei de la punctul b), daca $(a_{avg})^* = 0$, atunci egalitatea MMC are loc. Deoarece ${a'}_{avg}(C) = a_{avg}(C) - (a_{avg})^*$, rezulta ca $\exists C$ ciclu cu $a_{avg}(C) = (a_{avg})^*$, deci $({a'}_{avg})^* = 0$. Folosind punctul b), obtinem ca noua functie de cost $a'$ respecta egalitatea MMC.
+
+\begin{center}
+$0 = \min\limits_{v \in V} \max\limits_{0 \leqslant k \leqslant n-1} \frac{{A'}_n(v) - {A'}_k(v)}{n - k}= \min\limits_{v \in V} \max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(v) - n(a_{avg})^* - (A_k(v) - k(a_{avg})^*)}{n - k}$
+\end{center}
+
+\begin{center}
+$= \min\limits_{v \in V} \max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(v) - A_k(v) - (n - k)(a_{avg})^*}{n - k}= \min\limits_{v \in V} \max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(v) - A_k(v)}{n - k} - (a_{avg})^*$
+\end{center}
+
+Rezulta
+\begin{center}
+$(a_{avg})^* = \min\limits_{v \in V} \max\limits_{0 \leqslant k \leqslant n-1} \frac{A_n(v) - A_k(v)}{n - k}$
+\end{center}
+
+\newpage
+\section{Problema 3}
+
+\paragraph{•}
+Notam cu $n=\left| V \right| - 2$, adica numarul de noduri din $V-\{s, t\}$.
+Aratam ca exista drum colorat de la s la t, prima muchie avand culoarea c, daca si numai daca exista cuplaj perfect in graful $G_c$.
+
+\subsection{$(=>)$}
+\paragraph{•}
+Stim ca exista un drum colorat de la s la t (prima muchie are culoarea c) si aratam ca graful $G_c$ are cuplaj perfect.
+
+Consideram un cuplaj de cardinal 2n in $G_c$ in care nodul (x, u) este cuplat cu ($\overline{x}$, u), $\forall u \in V-\{s, t\}$.
+
+Fie $(s=y_0, y_1, y_2, ..., y_k=t)$ un drum colorat, muchia $(y_0, y_1)$ avand culoarea c. Urmatorul drum este un drum de crestere in $G_c$:
+
+\begin{center}
+$(s, (c, y_1), (\overline{c}, y_1), (\overline{c}, y_2), (c, y_2), (c, y_3), (\overline{c}, y_3), ..., (c, y_{k-1}), t)$
+\end{center}
+
+Deoarece cuplajul anterior avea cardinal 2n si exista drum de crestere, rezulta ca exista un cuplaj de cardinal $2n+2$. Dar $G_c$ are $2n+2$ varfuri, deci cuplajul este perfect.
+
+\subsection{$(<=)$}
+\paragraph{•}
+Stim ca exista cuplaj perfect in graful $G_c$ si aratam ca exista drum colorat de la s la t, prima muchie avand culoarea c.
+
+Construim un drum in $G_c$ astfel:
+
+Primul nod este s. Al doilea nod este nodul $(c, y_1)$ care este cuplat cu s. Urmatorul nod este $(\overline{c}, y_1)$. Fie $(x, y)$ nodul cu care este cuplat $(\overline{c}, y_1)$. Nu putem avea $y=y_1$ deoarece am obtine ori ca $(\overline{c}, y_1)$ este cuplat cu el insusi, ori ca $(c, y_1)$ este cuplat cu doua noduri. Rezulta $(x, y)=(\overline{c}, y_2)$. Continuand, urmatorul nod este $(c, y_2)$, care este cuplat cu $(c, y_3)$. Observam ca, atat timp cat nodul de pe pozitie para este diferit de s si t, vom gasi mereu un nod nou care sa fie adaugat la drum. Deoarece nu putem adauga nodul s de doua ori (pentru ca altfel ar fi cuplat cu doua noduri), rezulta ca in final vom ajunge la un nod care sa fie cuplat cu t. Drumul arata astfel:
+
+\begin{center}
+$(s, (c, y_1), (\overline{c}, y_1), (\overline{c}, y_2), (c, y_2), (c, y_3), (\overline{c}, y_3), ..., (c, y_{k-1}), (t))$
+\end{center}
+
+Muchiile de pe pozitii impare fac parte din cuplaj, in timp ce cele de pe pozitii pare nu. Se observa usor ca urmatorul drum in G este colorat: $(s, y_1, y_2, ..., y_{k-1}, t)$
+
+\newpage
+\section{Problema 4}
+
+\paragraph{•}
+Notam cu $l_1, l_2, ..., l_n$ nodurile din S si cu $r_1, r_2, ..., r_m$ nodurile din dreapta, unde $n=\left|S\right|, m=\left|T\right|$.
+
+\subsection{$(=>)$}
+
+\paragraph{•}
+Fie $H=(S, T; E')$ un graf partial respectand conditiile din enunt si $A\subseteq S$ o submultime oarecare a lui S.
+
+Fie $V(A)$ multisetul vecinilor lui A (un nod din T apare in $V(A)$ de x ori, unde x este numarul de vecini pe care ii are in A). Deoarece gradul fiecarui nod din A este exact k, avem $\left|V(A)\right| = k\left|A\right|$ (fiecare nod din A contribuie cu k elemente in $V(A)$). Daca in multisetul $V(A)$ exista un nod care apare de cel putin doua ori, atunci el are gradul cel putin 2 in H (nu se poate). Rezulta ca $V(A)$ este de fapt o multime si este inclusa in $N_G(A)$.
+
+Rezulta $\left|N_G(A)\right| \geqslant k \left| A\right| $
+
+\subsection{$(<=)$}
+
+\paragraph{•}
+Construim o retea de flux adaugand doua noduri: A (nodul sursa) si B (nodul destinatie).
+
+Pentru fiecare nod din S cream o muchie de la A la el de capacitate k, iar pentru fiecare nod din T cream o muchie de la el la B de capacitate 1. Capacitatile muchiilor din graful initial (orientate de la nodul din S la nodul din T) sunt $\infty$.
+
+Aratam ca fluxul maxim este nk. Folosind max-flow min-cut theorem, trebuie sa aratam ca taietura minima este egala cu $nk$.
+
+Daca consideram partitionarea $L=\{A\}$ si $R=S\cup T\cup \{B\}$, obtinem o taietura de cost nk, deci min-cut $\leqslant nk$.
+
+Consideram o taietura arbitrara. Fie x numarul de noduri din L care sunt din S $(x=\left|L\cap S\right|)$. Daca ar exista un nod in R care sa fie din $N_G(L \cap S)$, atunci ar exista o muchie de cost $\infty$ de la un nod din L la un nod din R, deci costul taieturii ar fi $\infty$. In caz contrar, toate nodurile din $N_G(L \cap S)$ sunt in L, deci L contine cel putin $\left| N_G(L \cap S) \right| \geqslant k\left| L \cap S \right| =kx$ noduri din T.
+
+Costul taieturii este mai mare sau egal decat: $k(n-x)+kx=nk$ (primul termen reprezinta muchiile de la A la nodurile din $S \cap R$, iar cel de-al doilea termen reprezinta o submultime de muchii de la $T \cap L$ la B.
+
+Rezulta ca orice taietura are costul cel putin egal cu $nk$, deci taietura minima este egala cu nk (am dat un exemplu mai sus).
+
+Consideram un flux de valoare maxima ($nk$) in reteaua noastra. Daca consideram graful partial format din toate muchiile din G care au fluxul 1, acesta satisface toate proprietatile din enunt: fiecare nod din S are gradul k (in caz contrar fluxul ar fi mai mic decat $nk$) si fiecare nod din T are gradul maxim 1 (altfel fluxul de pe muchia de la el la B ar fi mai mare ca 1).
+
+\end{document}

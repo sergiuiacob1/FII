@@ -1,0 +1,191 @@
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage[bottom=5em]{geometry}
+\usepackage{listings}
+
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+\title{Tema 3}
+\author{Vintur Cristian B4 \and Iacob Sergiu B1}
+\date{\normalsize\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problema 1}
+
+\paragraph{•}
+Construim graful $G'=\left(V',E'\right)$ unde $V'=V\cup\left\{s,t\right\}$ si $E'=E\cup\left\{\left(s,v\right)|w\left(v\right)>0\right\}\cup\left\{\left(v,t\right)|w\left(v\right)<0\right\}$. Consideram reteaua $R=\left(G,s,t,c\right)$ unde
+
+\[c(v,u)=\left\{\begin{array}{ll}
+	w(u)    &,v=s\\
+	-w(v)   &,u=t\\
+	\infty  &,v\neq s, u\neq t
+\end{array}\right.\]
+
+Fie $U\subseteq V$. Suma ponderilor nodurilor din $U$ poate fi scrisa astfel:
+\[ \sum_{v\in U} w(v) = \sum_{v\in U, w(v)>0} w(v) + \sum_{v\in U, w(v)<0} w(v) \]
+\[ =\sum_{v\in U, w(v)>0} w(v) + \sum_{v\in V-U, w(v)>0} w(v) + \sum_{v\in U, w(v)<0} w(v) - \sum_{v\in V-U, w(v)>0} w(v) \]
+\[ =\sum_{w(v)>0} w(v) - \left(\sum_{v\in V-U, w(v)>0} w(v) - \sum_{v\in U, w(v)<0} w(v)\right) =\left(\sum_{w(v)>0} w(v)\right) - x(U) \]
+unde $x(U)$ reprezinta termenul din paranteza.
+
+\paragraph{•}
+Deoarece ne intereseaza ca ponderea lui $U$ sa fie maxima, iar primul termen este constant, trebuie sa minimizam $x(U)$.
+
+\paragraph{•}
+Aratam ca pentru fiecare multime inchisa $U\subseteq V$, exista un s-t cut de cost $x(U)$, iar pentru orice s-t cut de cost finit, exista o multime inchisa $U\subseteq V$ pentru care $x(U)$ este egal cu costul taieturii. Valoarea minima a lui $x(U)$ va fi evident egala cu valoarea minima a unui s-t cut care, din max-flow min-cut theorem, este egala cu valoarea fluxului maxim de la s la t in reteaua construita.
+
+\paragraph{•}
+Fie $U\subseteq V$ inchisa, arbitrara. Consideram urmatorul s-t cut: $L=\{s\}\cup U$ si $R=\{t\}\cup (V-U)$. Costul acestuia este:
+\[ \sum_{v\in L, u\in R} c(v,u) = c(s,t) + \sum_{u\in V-U} c(s,u) + \sum_{v\in U} c(v,t) + \sum_{v\in U,u\in V-U} c(v,u) \]
+\[ = \sum_{u\in V-U} c(s,u) + \sum_{v\in U} c(v,t) = \sum_{v\in V-U, w(v)>0} w(v) + \sum_{v\in U, w(v)<0} (-w(v)) = x(U) \]
+deoarece nu exista arce de la noduri din $U$ la noduri din $V-U$.
+
+\paragraph{•}
+Invers, Consideram un s-t cut de cost finit arbitrar si aratam ca exista o multime $U\subseteq V$ pentru care $x(U)$ este egal cu costul taieturii. Fie $U=L-\{s\}$. Rezulta $L=\{s\}\cup U$ si $R=\{t\}\cup (V-U)$.
+
+\paragraph{•}
+Multimea $U$ este inchisa deoarece, in caz contrar, ar exista o muchie $(v,u),v\in U\subseteq L, u\in V-U\subseteq R$ avand $c(v,u)=\infty$, deci costul taieturii ar fi infinit. Se arata ca mai sus ca taietura are costul egal cu $x(U)$.
+
+\paragraph{•}
+Rezulta ca raspunsul este $\left(\sum_{w(v)>0} w(v)\right) - x(U) = \left(\sum_{w(v)>0} w(v)\right) - max\_flow$. Deoerece putem construi reteaua si afla diferenta in timp polinomial, rezulta ca probema se poate rezolva in timp polinomial.
+
+\newpage
+\section*{Problema 2}
+\subsection*{a)}
+
+\paragraph{•}
+Fie $G=(V, E)$ graful corespunzator secventei $d$.
+
+\paragraph{•}
+Consideram vectorul de perechi
+\[ s = ((d_{x_1}, x_1), (d_{x_2}, x_2), ..., (d_{x_n}, x_n)) \]
+sortat descrescator, mai intai dupa prima componenta si in caz de egalitate dupa a doua componenta ($x_i$ este nodul corespunzator componentei $d_i$).
+
+\paragraph{•}
+Fie $x_k$ nodul care este eliminat, $g=d_{x_k}$ gradul sau si $a_1, a_2, ..., a_g$ nodurile adiacente cu $x_k$, sortate in ordinea in care apar in vectorul $s$. Subgraful obtinut din $G$ prin eliminarea lui $x_k$ il notam cu $G'=(V', E')$.
+
+\paragraph{•}
+Fie $b_1, b_2, ..., b_g$ nodurile cu cele mai mari grade din $G$, excluzandu-l pe $x_k$ (acestea vor coincide cu primele $g$ noduri din vectorul $s'$ obtinut din $s$ din care s-a eliminat perechea $(d_{x_k}, x_k)$). Pornind de la graful $G'$, vom construi un graf $G''=(V'', E'')$ cu $V''=V'$, nodurile $b_i,1\leq i\leq g$ avand gradul cu 1 mai mic decat in $G$, restul nodurilor avand gradul egal cu cel din $G$. Deoarece $G''$ are secventa grafica egala cu vectorul $d'$, problema este rezolvata.
+
+\paragraph{•}
+Aratam cum construim graful $G''$.
+
+\paragraph{•}
+Deoarece $(d_{b_1}, b_1), (d_{b_2}, b_2), ..., (d_{b_g}, b_g)$ sunt cele mai mari valori din $s'$, iar $s'$ este ordonat strict descrescator, rezulta ca $d_{b_1}\geq d_{a_1}, d_{b_2}\geq d_{a_2}, ..., d_{b_g}\geq d_{a_g}$.
+
+\paragraph{•}
+Prin eliminarea lui $x_k$, gradul nodurilor $a_i$ a scazut cu 1, in timp ce gradul nodurilor $b_i$ a ramas la fel. Vom prezenta un algoritm care va mari gradul nodurilor $a_i$ cu 1 si va micsora gradul nodurilor $b_i$ cu 1, obtinand in final graful $G''$ dorit.
+
+\paragraph{}
+Consideram pe rand perechile $(a_i, b_i), 1\leq i\leq g$. Pentru $i$ fixat, consideram un varf $v$ arbitrar adiacent cu $b_i$ (acesta exista deoarece $d_{a_i} \geq 1$ pentru ca $a_i$ este adiacent cu $x_k$ si $d_{b_i}\geq d_{a_i}\geq 1$). Daca putem, alegem $v\neq a_i$, eliminam muchia $(b_i, v)$ si adaugam muchia $(a_i, v)$.
+
+\paragraph{}
+Daca nu putem face aceasta alegere, inseamna ca $d_{b_i} = 1$ si cum $1\leq d_{a_i}\leq d_{b_i} = 1$, rezulta ca $d_{a_i} = 1$. Dar, in cazul acesta, $a_i$ ar fi adiacent si cu $x_k$ si cu $b_i$ ($x_k\neq b_i$), deci gradul lui ar fi cel putin 2. Contradictie.
+
+\paragraph{}
+Rezulta ca mereu putem face alegerea de mai sus, deci in final vom obtine graful $G''$ dorit.
+
+\newpage
+\subsection*{b)}
+\paragraph{}
+Consideram urmatorul algoritm:
+
+\begin{lstlisting}
+bool check(vector<int> d, n) {
+	while(d.size() > 0)
+		// sorteaza vectorul d descrescator
+		sort(d)
+		
+		// gradul oricarui nod trebuie sa fie mai mic decat numarul de noduri
+		if(d.back() >= d.size()) return false
+		
+		// eliminam ultimul nod
+		for i=1 to d.back()
+			d[i] = d[i] - 1
+		
+		// eliminam ultima componenta
+		d.pop_back()
+	
+	return true
+}
+\end{lstlisting}
+
+\paragraph{}
+Corectitudinea algoritmului reiese din punctul a). Bucla while se executa de maxim $n$, unde n este numarul de noduri. Daca se alege o sortare in timp $O(n log(n))$, atunci complexitatea algortimului este $O(n^2 log(n))$, care este polinomiala in $n$.
+
+\newpage
+\section*{Problema 3}
+
+\paragraph{•}
+Fie $(i, j)$ nodul de pe linia i, coloana j.
+
+\subsection*{a)}
+\paragraph{•}
+Deoarece $t$ are gradul de iesire 0, valoarea unui flux este egal cu
+
+\[ \sum_{i=1}^{n} f((i,n),t) \leq \sum_{i=1}^{n} 1 = n \]
+
+\paragraph{•}
+Rezulta ca valoarea fluxului maxim este $\leq n$.
+
+\paragraph{•}
+Consideram urmatoarea functie
+\[ f(v,u)=\left\{\begin{array}{ll}
+	1    &,v=s,u=(i,1), 1\leq i\leq n \\
+	1    &,v=(i,n),u=t, 1\leq i\leq n \\
+	1    &,v=(i,j),u=(i,j+1), 1\leq i\leq n, 1\leq j < n \\
+	0    &,v=(i,j),u=(i+1,j), 1\leq i < n, 1\leq j \leq n
+\end{array}\right. \]
+
+\paragraph{•}
+Functia $f$ este o functie de flux, iar valoarea fluxului este
+\[ \sum_{i=1}^{n} f((i,n),t) = \sum_{i=1}^{n} 1 = n \]
+
+\paragraph{•}
+Deoarece $max\_flow \leq n$ si am gasit un flux de valoare $n$, rezulta ca $max\_flow = n$.
+
+\subsection*{b)}
+\paragraph{•}
+Sa presupunem ca primul drum de crestere ales este umatorul:
+\[ s, (1,1), (2,1), (2,2), (3,2), (3,3), ... (n-1,n-1), (n,n-1), (n,n), t \]
+
+\paragraph{•}
+Evident drumul de mai sus are valoarea 1. Aratam ca folosind numai arce directe nu putem gasi un alt drum de crestere, deci valoarea fluxului va fi 1.
+
+\paragraph{•}
+Prespunem, prin reducere la absurd, ca exista un alt drum de crestere, fie el
+\[ s, (i_1,j_1), (i_2,j_2), (i_3,j_3), ... (i_{p-1},j_{p-1}), (i_p,j_p), t \]
+
+\paragraph{•}
+Fie $k$ primul indice pentru care $i_k \leq j_k$ (acesta exista deoarece penultimul nod satiface $i_p\leq n=j_p$). Avem $k>1$ deoarece muchia $(s,(1,1))$ este saturata. Deoarece $k$ este minim cu aceasta proprietate, rezulta ca pentru nodul anterior $(i_{k-1},j_{k-1})$ avem $i_{k-1} > j_{k-1}$. Dar nodurile anterioare nu pot fi decat $(i_k-1,j_k)$ sau $(i_k,j_k-1)$. Daca $i_k \leq j_k$ rezulta $i_k-1 \leq j_k$, deci trebuie ca $(i_{k-1},j_{k-1})=(i_k,j_k-1)$.
+
+\paragraph{•}
+Deoarece $i_k \leq j_k = 1 + j_{k-1} < 1 + i_{k-1} = 1 + i_k$ rezulta $i_k = j_k$, deci nodul anterior este $(i_k,i_k-1)$. Rezulta ca in acest drum de crestere, avem muchie de la $(i_k,i_k-1)$ la $(i_k,i_k)$. Dar toate aceste muchii sunt saturate de primul drum de crestere ales, deci am obtinut o contradictie.
+
+\newpage
+\section*{Problema 4}
+\paragraph{•}
+Fie formula $F = C_1 \land C_2 \land ... \land C_m$ in FNC, unde $C_i$ este o disjunctie de literali. Presupunem $X$ ca fiind multimea tuturor variabilelor propozitionale din formula $F$ si $n = |X|$ numarul de variabile propozitionale.
+\paragraph{•}
+Construim digraful $D=(V, E)$, cu
+\[ V = \left\{x_i \in X\right\} \cup \left\{x_{i_f} | x_i \in X\right\} \cup \left\{x_{i_t} | x_i \in X\right\} \cup \left\{y, z\right\} \cup \left\{C_i | C_i \in F\right\}\]
+\[E = \left\{(x_i, x_{i_f}) | x_i \in X\right\} \cup \left\{(x_i, x_{i_t}) | x_i \in X\right\} \cup \left\{(x_{n_f}, y), (x_{n_t}, y), (y, z)\right\} \cup E' \]
+\[E' = \left\{(z, C_i) | C_i \in F \right\} \cup \left\{(C_i, x_{j_f}) | x_j \in C_i\right\} \cup \left\{(C_i, x_{j_t}) | \overline{x_j} \in C_i\right\}\]
+\paragraph{•}
+Aratam ca, pentru digraful $D$ si varful de start $x_1$, A are strategie de castig $\iff F$ este satisfiabila. Mutarile au loc astfel: A face prima mutare, incepand din $x_1$. Daca alege arcul $(x_1, x_{1_f})$, atunci $x_1 = false$, iar daca alege arcul $(x_1, x_{1_t})$, $x_1 = true$. Apoi, B alege ori $(x_{1_f}, x_2)$, ori $(x_{1_t}, x_2)$, in functie de extremitatea finala a arcului ales de A. Se procedeaza astfel pentru $\forall x_i, 1\leq{i}\leq{n}$.
+\paragraph{•}
+Apoi, B alege ori $(x_{n_f}, y)$, ori $(x_{n_t}, y)$ si A va alege $(y, z)$. In continuare, B trebuie sa aleaga un arc $(x_n, C_i), 1\leq{i}\leq{m}$. Exista doua cazuri: $C_i$ este ori false, ori true.
+\paragraph{•}
+Daca $C_i$ este true $\Rightarrow \exists $ un literal $L=true\in{C_i}$ si variabila propozitionala $x_j$ corespunzatoare lui $L$ (adica $L=x_j$ sau $L=\overline{x_j}$). Daca $L=x_j$, atunci exista arcul $(C_i, x_{j_f})$, iar nodul $x_{j_f}$ nu este vizitat (daca ar fi fost vizitat, atunci $x_j$ ar fi avut valoarea $false$, deci si $L=x_j$ ar fi fost $false$). Daca $L=\overline{x_j}$, atunci exista arcul $(C_i, x_{j_t})$, iar nodul $x_{j_t}$ nu este vizitat. In functie de caz, A alege nodul nevizitat $x_{j_f}$ sau $x_{j_t}$. In continuare, B poate sa aleaga doar un arc cu extremitatea finala in $x_{j+1}$, dar acest nod a fost deja vizitat, deci B nu mai poate sa mute si A castiga.
+\paragraph{•}
+Daca $C_i$ este false, inseamna ca pentru $\forall L\in C_i, L=x_j$ sau $L=\overline{x_j}$, avem $L=false$. Asta inseamna ca pentru orice literal $L \in C_i$, daca $L=x_j$ A a ales arcul $(x_j, x_{j_f})$ si in graf avem arcul $(C_i, x_{j_f})$, iar daca $L=\overline{x_j}$, A a ales arcul $(x_j, x_{j_t})$ si in graf avem arcul $(C_i, x_{j_t})$. In ambele cazuri, A ar putea alege doar un arc $(C_i, x_{j_f})$ sau $(C_i, x_{j_t})$, dar extremitatile finale ale acestor arce au fost deja vizitate prin alegerile anterioare ale lui A. Asadar, A nu mai are mutare si B castiga.
+\paragraph{•}
+Rezulta ca, pentru a castiga, B este obligat sa aleaga o clauza care are valoarea $false$ pentru valorile variabilelor alese de A. Daca formula $F$ este satisfiabila, atunci A va putea alege valoarile pentru $x_i$ astfel incat toate clauzele sa fie $true$, deci B pierde in acest caz. Daca $F$ este nesatisfiabila, atunci orice alegeri ar face A, va exista o clauza cu valoarea $false$ pe care o va alege B si va castiga. Rezulta ca A are strategie de castig daca si numai daca $F$ este satisfiabila.
+\paragraph{•}
+Numarul de noduri este $n+2n+2+m=3n+m+2$, iar numarul de arce este $4*n+1+m+n = 5n+m+1$. Putem reduce astfel problema $SAT$ la problema $ASTRAT$ in timp polinomial.
+\end{document}	

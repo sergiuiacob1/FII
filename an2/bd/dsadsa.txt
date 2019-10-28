@@ -1,0 +1,43 @@
+select nr_matricol || ':' || nume || '-' || prenume as "Studenti cu note mari" from studenti
+where an = 3 and lower(nume) in ('%a', '%e', '%i', '%o', '%u')
+and nr_matricol in 
+	(select nr_matricol from note
+  where valoare >= 8 and id_curs in
+  	(select id_curs from cursuri where credite >=6));
+
+
+select nr_matricol as "Bogatani" from studenti
+where bursa is not null and bursa >= 400
+UNION
+(select nr_matricol as "Bogatani" from studenti
+where bursa is not null and bursa*2 >= 400
+INTERSECT
+select nr_matricol as "Bogatani" from note
+where valoare >= 7
+)
+Order by 1 DESC;
+
+Geany Morandi face aprox. 400 de lei in Himalaya lunar. Afisati in coloana "Bogatani" toate numerele matricole ale studentilor care ar putea castiga cel putin la fel de mult ca Geany. Castigul unui student este egal cu bursa lui. Daca nu are bursa, atunci castiga 0 lei. Daca un student are macar o nota de 7, atunci el castiga dublul bursei lui.
+Ordonati numerele matricole descrescator.
+
+
+select nume || '~' || prenume || '~' || nr_matricol as "Detalii" from studenti
+where mod (to_number(nr_matricol), 2) = 1 or mod (to_number(nr_matricol), 10) = 0
+UNION
+select bursa*1.5 as "BURSA" from studenti
+where bursa is not null and mod (to_number(nr_matricol), 2) = 1
+UNION
+select bursa*1.25 as "BURSA" from studenti
+where bursa is not null and mod (to_number(nr_matricol), 2) = 0
+UNION
+select 123 as "BURSA" from studenti
+where bursa is null;
+
+
+aia cu marginalizarea
+(select nr_matricol as "Cenusareasa & 7 pitiki" from studenti
+MINUS
+select nr_matricol from note)
+UNION
+select id_prof as "Cenusareasa & 7 pitiki" from profesori
+where prenume like '%a%' and prenume not like '%a%a%'

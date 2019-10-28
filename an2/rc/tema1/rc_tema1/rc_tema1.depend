@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1508248174 source:/home/sergiu/work/rc/tema1/rc_tema1/main.c
+	<stdio.h>
+	<dirent.h>
+	<sys/types.h>
+	<string.h>
+	<unistd.h>
+	<stdbool.h>
+	<stdlib.h>
+

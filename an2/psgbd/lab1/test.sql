@@ -1,0 +1,1 @@
+select * from (select count(*), nume from studenti group by nume order by count(*) desc) where rownum = 1;

@@ -1,0 +1,11 @@
+x := 5000000;
+//com
+//com 2
+y := 0; //com 3
+while x > 0
+{
+  y := y + x;
+  x := x - 1;
+}
+result := y;
+//com 4

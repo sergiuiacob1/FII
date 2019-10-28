@@ -1,0 +1,4 @@
+security
+
+Decrypt first file using this password. Use the solution as password to decrypt the second file. 
+

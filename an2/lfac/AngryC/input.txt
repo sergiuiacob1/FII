@@ -1,0 +1,64 @@
+int varInt1! int varInt2!
+double varDouble1!
+double vecDouble1[5]!
+bool mahbool!
+string mystr!
+void Functie (int, int) {}!
+int f2() {}!
+int f2(int) {}!
+int f3 (void, string, int) {}!
+const int constInt=221!
+const double constDouble=1.5!
+const string constString="a"!
+
+struct someStruct1{
+    int camp1!
+    bool camp2!
+}!
+
+struct someStructNr2{
+     string campAux!
+}!
+
+START_ALREADY!
+
+varInt1 = -1*(-3)-3+1*(-2)!
+yell (varInt1)!
+yell("\n")!
+
+mystr = "iubesc" + " lfac-ul"!
+yell(mystr)!
+yell("\n")!
+
+mahbool = (varInt1 == 4)!
+mahbool=~mahbool!
+yell(mahbool)!
+yell("\n")!
+
+vecDouble1[0]=5.5!
+yell(vecDouble1[0])!
+yell("\n")!
+varInt1 = 1!
+vecDouble1[varInt1] = 16.154!
+yell (vecDouble1[varInt1])!
+yell ("\n")!
+yell (++varInt1*2-3)!
+yell ("\n")!
+
+f2(2)!
+Functie (5, f2())!
+f3(Functie(2, 3), "salz", f2())!
+
+if (mahbool==1 && varInt1< (10+5-2*varInt1)) {varInt1=5!} else {varInt2=4!}!
+for (varInt1=2! varInt1<5! varInt1+=2)
+    {
+        varInt2=2!
+    }!
+
+varDouble1 = 10!
+while (varDouble1>=10 && varInt1 == varInt2){
+    varDouble1+=5!
+    yell ("woohoo")!
+    yell("\n")!
+}!
+ARE_WE_DONE_YET?!

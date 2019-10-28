@@ -1,0 +1,3 @@
+﻿  Source.cpp
+Source.obj : error LNK2001: unresolved external symbol __imp__PathCchCombine@16
+C:\Users\sergiu\OneDrive\facultate\an3\csso\tema1\Release\tema1.exe : fatal error LNK1120: 1 unresolved externals

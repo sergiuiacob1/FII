@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bike-shop>
+    <owner> Andrei </owner>
+    <phone> 0743900608 </phone>
+    <schedule>
+        <Monday> sal </Monday>
+        <Tuesday> sal </Tuesday>
+        <Wednesday> sal </Wednesday>
+        <Thursday> sal </Thursday>
+        <Friday> sal </Friday>
+        <Saturday> sal </Saturday>
+        s<Sunday> sal </Sunday>
+    </schedule>
+
+    <bikes>
+        <bike build-at = "ora 12 dimineata"/>
+    </bikes>
+</bike-shop>

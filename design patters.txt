@@ -1,0 +1,81 @@
+singleton:
+	static member: static Singleton* instance
+	private constructor (sa nu faca useru mai multe instante)
+	static function: static Singleton* getInstance()
+	
+	ATENTIE: orice membru static trebuie declarat si in afara clasei :) :) :) 
+
+builder:
+	concrete builder: construieste si asambleaza partile complexe step by step
+	director: construieste obiectul complex
+	product: reprezinta obiectul creat
+	when we wanna create an object composed from other complex objects step by step
+	
+	abstract builder; jetbuilder: builder, navalBuilder: builder, etc.
+	Director; buildPlane (builder)  builder->makeParts();	builder->makeBody(); etc ... builder->returnProduct()
+	
+object factory:
+	toy (abstract class) then car:Toy helicopter:Toy etc...
+	class ToyFactory; cu metoda buildToy (type)
+	
+	
+<------------------------------------------------------->
+
+bridge:
+	pentru shape, am si shapeImplementation
+	in shape am un pointer catre shapeImplementation, sa zicem
+	si pt fiecare chestie derivata din shape
+	o sa mosteneasca si shapeImplementation
+
+composite:
+	class Composite
+	class Component
+	class Leaf
+	un Composite are mai multe Component, care la randul lor pot fi Composite
+	
+adapter:
+	2 incompatible interfaces working together
+	EnemyAttacker (firesWeapon, drivesCarForward());
+	EnemyRobot e derivat din EnemyAttacker, dar
+	el nu are firesWeapon si nici nu conduce, el:
+	punches(), walksForward();
+	
+	solutie:
+	EnemyRobotAdapter, care:
+	firesWeapon de fapt apeleaza punches()
+	drivesCarForward() apeleaza walksForward() 
+	etc.
+	
+flyweight:
+	used when creating a large number of similar objects
+	ex 10210301203123123812 similar objects
+	ex. vrem sa desenam DMAX dreptunghiuri in functie de culoare
+	dak deja avem un obiect cu acea culoare, doar ii modificam coordonatele
+
+
+<------------------------------------------------------->
+visitor:
+	class Fruct
+	in fruct am metoda virtual accept (visitor*)
+	visitorVit : public Visitor
+	in visitorVit: visitMar, visitPortocala etc
+	mar: fruct; perje:fruct
+	mar: accept(visitor* visitator) {  visitator.visitMar() }
+
+observer:
+	prima data creez class, apoi observeri!!!!
+	class obj; concreteObserver (obj)...
+
+	in clasa:
+		list <Observer *> observatori
+		attach (observer)	(push_back ...)
+		notify() (apelata intern, observer->update()
+	in observer:
+		Observer(class ) {class = class; class -> attach(this) }
+		virtual update()
+
+		are copii: concreteObserver...
+		la copii, constructorul: concreteObserver (class*) : Observer (class) (nu necesar, da crek merge)
+		
+iterator:
+	

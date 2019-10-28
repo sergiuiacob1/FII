@@ -1,0 +1,12 @@
+int a;
+int b;
+int c;
+
+begin_progr
+a:=2;
+b:=10;
+a:=a-b;
+c:=a-b;
+yell(a);
+yell("\n");
+end_progr

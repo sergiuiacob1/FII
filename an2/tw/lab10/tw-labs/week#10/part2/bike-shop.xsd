@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="bike-shop">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="owner" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="phone" type="xs:string" minOccurs="1" maxOccurs="3"/>
+                <xs:element name="schedule">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Monday" type="xs:string"/>
+                            <xs:element name="Tuesday" type="xs:string"/>
+                            <xs:element name="Wednesday" type="xs:string"/>
+                            <xs:element name="Thursday" type="xs:string"/>
+                            <xs:element name="Friday" type="xs:string"/>
+                            <xs:element name="Saturday" type="xs:string"/>
+                            <xs:element name="Sunday" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="bikes">
+                <xs:complexType>
+                        <xs:all>
+                            <xs:element name="bike">
+                                <xs:complexType>
+                                    <xs:attribute name="bought-from" type="xs:string"/>
+                                    <xs:attribute name="build-at" type="xs:string" use="required"/>
+                                    <xs:attribute name="refurbished-at" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

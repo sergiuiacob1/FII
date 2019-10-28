@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "nr = c (5, 1, 4, 2, 7, 3, 6)\n\nquicksort = function (st, dr){\n  if (st<dr){\n    poz = divide (st, dr);\n    \n    quicksort (st, poz);\n    quicksort (poz+1, dr);\n  }\n}\n\ndivide=function (st, dr){\n  pivot = sample (nr[st:dr], 1);\n  \n  while (st<dr){\n    while (st<dr && nr[dr]>=pivot){\n      dr=dr-1\n    }\n    \n    while (st<dr && nr[st]<=pivot){\n      st=st+1\n    }\n    \n    if (st<dr){\n      aux = nr[st];\n      nr[st] = nr[dr];\n      nr[dr] = aux;\n    }\n  }\n  \n  nr[st] = pivot;\n  return (st);\n}\n\nquicksort (1, 2)\nprint (nr)\n",
+    "created" : 1495047239359.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1338482980",
+    "id" : "6A5A067F",
+    "lastKnownWriteTime" : 1495047247,
+    "last_content_update" : 1495047247584,
+    "path" : "D:/work/facultate/ps/tema2_ex1.R",
+    "project_path" : "tema2_ex1.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

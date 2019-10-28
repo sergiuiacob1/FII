@@ -1,0 +1,4 @@
+﻿  Source.cpp
+LINK : warning LNK4076: invalid incremental status file 'D:\OneDrive\facultate\genetici\tema1_v2\Debug\tema1_v2.ilk' (which will be deleted); linking nonincrementally
+  tema1_v2.vcxproj -> D:\OneDrive\facultate\genetici\tema1_v2\Debug\tema1_v2.exe
+  tema1_v2.vcxproj -> D:\OneDrive\facultate\genetici\tema1_v2\Debug\tema1_v2.pdb (Partial PDB)

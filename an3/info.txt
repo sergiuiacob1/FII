@@ -1,0 +1,27 @@
+csso:
+students.info.uaic.ro/~george.popoiu
+ai:
+https://sites.google.com/view/iafii
+Artificial Intelligence: A modern approach
+profs.info.uaic.ro/~dcristea/cursuri/IA/carteaIA.pdf
+
+
+ml:
+media si varianta pt aruncarea unei monede + aruncarea unui zar perfect
+distributia binomiala: b(r; n; p) poate fi reprezentata ca o suma de n distributii Bernoulli; B(p) = b(r; 1; p)
+X~B(p)
+X: (0  1)
+   (1-p p)
+1 insemnand stema
+
+probabilitatea de liniaritate a mediilor
+E[SUM(aiXi)] = SUM(ai*E[Xi])
+^ asta de retinut
+
+variance of x:  Var(X) = (def) = (E[X^2] - E[X])^2
+
+*T: calculat varianta pentru distributia gaussiana (problema 26)
+
+21, 23, 26
+16, 17, 76, 77, 24
+18, 28

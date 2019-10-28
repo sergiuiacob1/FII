@@ -1,0 +1,4 @@
+﻿  Source.cpp
+d:\work\genetici\tema0\tema0\source.cpp(167): warning C4101: 'randomPoz': unreferenced local variable
+  tema0.vcxproj -> D:\work\genetici\tema0\Debug\tema0.exe
+  tema0.vcxproj -> D:\work\genetici\tema0\Debug\tema0.pdb (Partial PDB)

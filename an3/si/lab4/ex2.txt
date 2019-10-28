@@ -1,0 +1,18 @@
+Iacob Sergiu, B1
+Exercitiul 2
+
+ls -l /etc/shadow
+# -rw-r----- 1 root shadow 1464 Oct 21 11:37 /etc/shadow
+# Vedem ca fisierul este detinut de root
+more /etc/shadow
+# more: cannot open /etc/shadow: Permission denied
+# Nu avem permisiuni de citire
+which more
+# /bin/more
+# Acordam capabilitati de citire comenzii
+su -
+setcap CAP_DAC_READ_SEARCH+ep /bin/more
+# Ne logam din nou cu userul creat
+su - testuser
+more /etc/shadow
+# Acum functioneaza

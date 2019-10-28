@@ -1,0 +1,2 @@
+
+        iterator = iter(theElement)
