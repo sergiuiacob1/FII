@@ -1,9 +1,8 @@
 def print_arguments(function):
     def f(*args, **kwargs):
-        fRes = function(*args, **kwargs)
         print(
             f'The arguments are ({args}, {{{kwargs}}})')
-        return fRes
+        return function(*args, **kwargs)
     return f
 
 
@@ -19,7 +18,7 @@ if __name__ == '__main__':
     augmented_multiply_by_two = print_arguments(multiply_by_two)
     # this will print: Arguments are: (10,), {} and will return 20.
     x = augmented_multiply_by_two(10)
-    print (x)
+    print(x)
 
     augmented_add_numbers = print_arguments(add_numbers)
     # this will print: Arguments are: (3, 4), {} and will return 7.
