@@ -4,11 +4,7 @@ from multiply_output import *
 
 
 def augment_function(function, decorators):
-    # return reduce(lambda f1, f2: f2(f1(function)), decorators[::-1])
-    function = decorators[-1](function)
-    for decorator in reversed(decorators[:-1]):
-        function = decorator(function)
-    return function
+    return reduce(lambda f1, f2: f2(f1(function)), decorators[::-1])
 
 
 def add_numbers(a, b):
@@ -20,4 +16,4 @@ decorated_function = augment_function(
 print(decorated_function)
 # this will print: Arguments are: (3, 4), {} and will return (2 * (3 + 4))
 x = decorated_function(3, 4)
-# print(x)
+print(x)
