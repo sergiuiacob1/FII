@@ -26,13 +26,13 @@ def main():
     print('Getting train, validation and test data...')
     # trainData, testData = getTrainAndTestData()
     trainData, validationData, testData = load_data_wrapper()
-    trainData += validationData
+    # trainData += validationData
     model = NeuralNetwork((784, 30, 10))
-    model.fit(trainData=trainData, testData=testData,
-              epochs=10, miniBatchSize=10, eta=0.5, regularizationValue=5.0)
-    predictions = model.predict([item[0] for item in testData])
-    accuracy = sum([int(prediction == truth) for prediction, truth in zip(predictions, [item[1] for item in testData])]) / len(testData) * 100
-    print(f'Model has an accuracy of {accuracy}')
+    model.fit(training_data=trainData, test_data=testData,
+              epochs=10, mini_batch_size=10, eta=0.5, lmbda=5.0)
+    # predictions = model.predict([item[0] for item in testData])
+    # accuracy = sum([int(prediction == truth) for prediction, truth in zip(predictions, [item[1] for item in testData])]) / len(testData) * 100
+    # print(f'Model has an accuracy of {accuracy}')
 
     saveResults(model)
 

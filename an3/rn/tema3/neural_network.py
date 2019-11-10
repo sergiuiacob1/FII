@@ -1,30 +1,118 @@
-import numpy as np
+import sys
+import mnist_loader
 import random
+import numpy as np
 
 
-class CrossEntropyCost(object):
+class NeuralNetwork(object):
+    # the list sizes contains the number of neurons in the respective layers.
+    def __init__(self, sizes):
+        # the number of the layers in NeuralNetwork
+        self.num_layers = len(sizes)
+        self.sizes = sizes
+        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
+        self.weights = [np.random.randn(y, x) / np.sqrt(x)
+                        for x, y in zip(sizes[:-1], sizes[1:])]
 
-    @staticmethod
-    def fn(a, y):
-        """Return the cost associated with an output ``a`` and desired output
-        ``y``.  Note that np.nan_to_num is used to ensure numerical
-        stability.  In particular, if both ``a`` and ``y`` have a 1.0
-        in the same slot, then the expression (1-y)*np.log(1-a)
-        returns nan.  The np.nan_to_num ensures that that is converted
-        to the correct value (0.0).
+    def feedforward(self, a):
+        """Return the output of the network if "a" is input"""
+        for b, w in zip(self.biases, self.weights):
+            a = sigmoid(np.dot(w, a) + b)
+        return a
 
+    def fit(self, training_data, epochs, mini_batch_size, eta,
+            test_data=None, lmbda=0.1):
         """
-        return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
-
-    @staticmethod
-    def delta(z, a, y):
-        """Return the error delta from the output layer.  Note that the
-        parameter ``z`` is not used by the method.  It is included in
-        the method's parameters in order to make the interface
-        consistent with the delta method for other cost classes.
-
+        Train the neural network using mini-batch stochastic gradient descent.
+        The "training_data" is a list of tuples "(x,y)" representing the training inputs
+        and the desired output. The other non-optional parameters are self-explanatory.
+        If "test_data" is provided then the network will be evaluated against the test 
+        data after each epoch, and partial progress printed out. This is useful for tracking
+        process, but slows things down substantially.
         """
-        return (a-y)
+        if test_data:
+            n_test = len(test_data)
+        n = len(training_data)
+        for j in range(epochs):
+            # rearrange the training_data randomly
+            random.shuffle(training_data)
+            mini_batches = [training_data[k:k + mini_batch_size]
+                            for k in range(0, n, mini_batch_size)]
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, eta, n, lmbda)
+            if test_data:
+                print("Epoch {0}: {1} / {2}".format(j,
+                                                    self.evaluate(test_data), n_test))
+            else:
+                print("Epoch {0} complete".format(j))
+
+    def update_mini_batch(self, mini_batch, eta, n_trainingData, lmbda):
+        """
+        Update the network's weights and biases by applying gradient descent using backpropagation
+        to a single mini batch. The "mini_batch" is a list of tuples "(x,y)" and "eta" is the learning
+        rate.
+        """
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        for x, y in mini_batch:
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
+            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+        self.weights = [(1 - eta * lmbda / n_trainingData)*w-(eta/len(mini_batch))*nw
+                        for w, nw in zip(self.weights, nabla_w)]
+        self.biases = [b-(eta/len(mini_batch))*nb
+                       for b, nb in zip(self.biases, nabla_b)]
+
+    def backprop(self, x, y):
+        """Return a tuple ``(nabla_b, nabla_w)`` representing the
+gradient for the cost function C_x.  ``nabla_b`` and
+``nabla_w`` are layer-by-layer lists of numpy arrays, similar
+to ``self.biases`` and ``self.weights``."""
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+    # feedforward
+        activation = x
+        activations = [x]  # list to store all the activations, layer by layer
+        zs = []  # list to store all the z vectors, layer by layer
+        for b, w in zip(self.biases, self.weights):
+            z = np.dot(w, activation)+b
+            zs.append(z)
+            activation = sigmoid(z)
+            activations.append(activation)
+    # backward pass
+        # this is differet from that in previous file
+        delta = self.cost_derivative(activations[-1], y)
+        nabla_b[-1] = delta
+        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+    # Note that the variable l in the loop below is used a little
+    # differently to the notation in Chapter 2 of the book.  Here,
+    # l = 1 means the last layer of neurons, l = 2 is the
+    # second-last layer, and so on.  It's a renumbering of the
+    # scheme in the book, used here to take advantage of the fact
+    # that Python can use negative indices in lists.
+        for l in range(2, self.num_layers):
+            z = zs[-l]
+            sp = sigmoid_prime(z)
+            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            nabla_b[-l] = delta
+            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+        return (nabla_b, nabla_w)
+
+    def evaluate(self, test_data):
+        """Return the number of test inputs for which the neural
+network outputs the correct result. Note that the neural
+network's output is assumed to be the index of whichever
+neuron in the final layer has the highest activation."""
+        test_results = [(np.argmax(self.feedforward(x)), y)
+                        for (x, y) in test_data]
+        return sum(int(x == y) for (x, y) in test_results)
+
+    def cost_derivative(self, output_activations, y):
+        """Return the vector of partial derivatives \partial C_x /
+\partial a for the output activations."""
+        return (output_activations-y)
+
+# Miscellaneous functions
 
 
 def sigmoid(z):
@@ -35,113 +123,3 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
-
-
-class NeuralNetwork:
-    def __init__(self, layerDims):
-        self.noLayers = len(layerDims)
-        self.layerDims = layerDims
-        # Custom weights initializations (course 4)
-        # TODO
-        self.biases = [np.random.randn(y, 1) for y in layerDims[1:]]
-        self.weights = [np.random.randn(y, x)
-                        for x, y in zip(layerDims[:-1], layerDims[1:])]
-
-    def fit(self, trainData, epochs=10, miniBatchSize=10, eta=0.5, regularizationValue=5, testData=None):
-        """Fits the Neural Network using Stochastic Gradient Descent"""
-        bestWeights = None
-        bestBiases = None
-        bestCost = None
-        noOfMiniBatches = len(trainData)//miniBatchSize
-        if len(trainData) % miniBatchSize > 0:
-            noOfMiniBatches += 1
-
-        for i in range(epochs):
-            print(f'Starting epoch {i}/{epochs}...')
-            # shuffle
-            random.shuffle(trainData)
-            # p = np.random.permutation(n)
-            # X, y = X[p], y[p]
-
-            # update per batch
-            for j in range(noOfMiniBatches):
-                batch = trainData[j * miniBatchSize:(j + 1) * miniBatchSize]
-                self.updateMiniBatch(
-                    batch, eta, regularizationValue, len(trainData))
-
-            # this epoch is done, evaluate
-            if testData is not None:
-                nailedCases = self.evaluate(testData)
-                cost = len(testData) - nailedCases
-                print(f'Epoch {i}: {nailedCases}/{len(testData)}')
-
-                if bestCost is None or (bestCost is not None and bestCost > cost):
-                    bestCost = cost
-                    bestBiases = self.biases
-                    bestWeights = self.weights
-
-        if bestWeights is not None and bestBiases is not None:
-            self.weights = bestWeights
-            self.biases = bestBiases
-
-    def updateMiniBatch(self, data, eta, regularizationValue, n):
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
-        m = len(data)
-        for x, y in data:
-            delta_nabla_b, delta_nabla_w = self.backPropagation(x, y)
-            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
-            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [(1-eta*(regularizationValue/n))*w-(eta/m)*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/m)*nb
-                       for b, nb in zip(self.biases, nabla_b)]
-
-    def evaluate(self, data):
-        test_results = [(np.argmax(self.feedForward(x)), t)
-                        for (x, t) in data]
-        return sum([int(x == y) for (x, y) in test_results])
-
-    def predict(self, X):
-        return [np.argmax(self.feedForward(x)) for x in X]
-
-    def feedForward(self, a):
-        """Returns the output of the network if `a` is input"""
-        for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
-        return a
-
-    def backPropagation(self, x, y):
-        """Backpropagates the error and returns, for each neuron in the Neural Network, how much of the error comes from that neuron"""
-        # """Return a tuple ``(nabla_b, nabla_w)`` representing the
-        # gradient for the cost function C_x.  ``nabla_b`` and
-        # ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
-        # to ``self.biases`` and ``self.weights``."""
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
-        # feedforward
-        activation = x
-        activations = [x]  # list to store all the activations, layer by layer
-        zs = []  # list to store all the z vectors, layer by layer
-        for b, w in zip(self.biases, self.weights):
-            z = np.dot(w, activation)+b
-            zs.append(z)
-            activation = sigmoid(z)
-            activations.append(activation)
-        # backward pass
-        delta = (CrossEntropyCost).delta(zs[-1], activations[-1], y)
-        nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
-        # Note that the variable l in the loop below is used a little
-        # differently to the notation in Chapter 2 of the book.  Here,
-        # l = 1 means the last layer of neurons, l = 2 is the
-        # second-last layer, and so on.  It's a renumbering of the
-        # scheme in the book, used here to take advantage of the fact
-        # that Python can use negative indices in lists.
-        for l in range(2, len(self.layerDims)):
-            z = zs[-l]
-            sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
-            nabla_b[-l] = delta
-            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
-        return (nabla_b, nabla_w)
