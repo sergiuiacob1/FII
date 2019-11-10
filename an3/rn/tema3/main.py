@@ -9,13 +9,13 @@ from neural_network import NeuralNetwork
 from mnist_loader import load_data_wrapper
 
 
-def saveResults(model):
+def save_results(model):
     print('Serializing model...')
     with open('model.pkl', 'wb') as f:
         joblib.dump(model, f)
 
 
-def getSavedResults():
+def get_saved_results():
     print('Deserializing model...')
     with open('model.pkl', 'rb') as f:
         model = joblib.load(f)
@@ -24,17 +24,15 @@ def getSavedResults():
 
 def main():
     print('Getting train, validation and test data...')
-    # trainData, testData = getTrainAndTestData()
-    trainData, validationData, testData = load_data_wrapper()
-    # trainData += validationData
+    train_data, _, test_data = load_data_wrapper()
     model = NeuralNetwork((784, 30, 10))
-    model.fit(training_data=trainData, test_data=testData,
-              epochs=10, mini_batch_size=10, eta=0.5, lmbda=5.0)
+    model.fit(training_data=train_data, test_data=test_data,
+              epochs=10, mini_batch_size=10, eta=0.5, regularization_parameter=5.0)
     # predictions = model.predict([item[0] for item in testData])
     # accuracy = sum([int(prediction == truth) for prediction, truth in zip(predictions, [item[1] for item in testData])]) / len(testData) * 100
     # print(f'Model has an accuracy of {accuracy}')
 
-    saveResults(model)
+    save_results(model)
 
 
 if __name__ == '__main__':
