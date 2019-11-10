@@ -23,25 +23,22 @@ class NeuralNetwork(object):
         return a
 
     def fit(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None, regularization_parameter=0.1, p_dropout=0.2):
-        if test_data:
-            n_test = len(test_data)
-        n = len(training_data)
+            test_data=None, regularization_parameter=0.1, p_dropout=0.2, beta_momentum=0.9):
         for j in range(epochs):
-            # rearrange the training_data randomly
+            # shuffle
             random.shuffle(training_data)
             mini_batches = [training_data[k:k + mini_batch_size]
-                            for k in range(0, n, mini_batch_size)]
+                            for k in range(0, len(training_data), mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(
-                    mini_batch, eta, n, regularization_parameter, p_dropout)
+                    mini_batch, eta, len(training_data), regularization_parameter, p_dropout, beta_momentum)
             if test_data:
                 print("Epoch {0}: {1} / {2}".format(j,
-                                                    self.evaluate(test_data), n_test))
+                                                    self.get_nailed_cases(test_data), len(test_data)))
             else:
                 print("Epoch {0} complete".format(j))
 
-    def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout):
+    def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout, beta_momentum):
         """
         Update the network's weights and biases by applying gradient descent using backpropagation
         to a single mini batch. The "mini_batch" is a list of tuples "(x,y)" and "eta" is the learning
@@ -49,21 +46,42 @@ class NeuralNetwork(object):
         """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
+        momentum_nabla_b = [np.zeros(b.shape) for b in self.biases]
+        momentum_nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y, p_dropout)
+            delta_nabla_b, delta_nabla_w = self.back_propagation(
+                x, y, p_dropout)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        # Applying L2 Regularization
-        self.weights = [(1 - eta * regularization_parameter / training_data_length)*w-(eta/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, nabla_b)]
+        # Applying momentum
+        momentum_nabla_b = np.multiply(
+            momentum_nabla_b, beta_momentum) + np.multiply(nabla_b, 1 - beta_momentum)
+        momentum_nabla_w = np.multiply(
+            momentum_nabla_w, beta_momentum) + np.multiply(nabla_w, 1 - beta_momentum)
 
-    def backprop(self, x, y, p_dropout):
-        """Return a tuple ``(nabla_b, nabla_w)`` representing the
-        gradient for the cost function C_x.  ``nabla_b`` and
-        ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
-        to ``self.biases`` and ``self.weights``."""
+        # Applying L2 Regularization
+        # update weights and biases
+        self.weights = [(1 - eta * regularization_parameter / training_data_length)*w-(eta/len(mini_batch))*nw
+                        for w, nw in zip(self.weights, momentum_nabla_w)]
+        self.biases = [b-(eta/len(mini_batch))*nb
+                       for b, nb in zip(self.biases, momentum_nabla_b)]
+
+        self.apply_maxnorm()
+
+    def apply_maxnorm(self):
+        c = 5
+        epsilon = 10 ** (-8)
+        # for each hidden layer
+        for l in range (1, self.no_of_layers - 1):
+            # for each neuron in this layer, update the weights that determine his value
+            for i in range (0, self.layer_dimensions[l]):
+                w_neuron = self.weights[l-1][i]
+                value = np.sqrt(sum([w**2 for w in w_neuron]))
+                if value > c:
+                    w_neuron = np.multiply(w_neuron, c/(value + epsilon))
+                    self.weights[l-1][i] = w_neuron
+
+    def back_propagation(self, x, y, p_dropout):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         # feedforward
@@ -79,7 +97,7 @@ class NeuralNetwork(object):
                 size=len(activation), n=1, p=p_dropout)).reshape((len(activation), 1))
             activation = np.multiply(activation, dropout)
             activation = np.multiply(activation, 1.0/(1.0-p_dropout))
-            
+
             activations.append(activation)
         # Using softmax for the last layer
         # Course 4, slide 27
@@ -99,11 +117,8 @@ class NeuralNetwork(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def evaluate(self, test_data):
-        """Return the number of test inputs for which the neural
-        network outputs the correct result. Note that the neural
-        network's output is assumed to be the index of whichever
-        neuron in the final layer has the highest activation."""
+    def get_nailed_cases(self, test_data):
+        """Returns how many cases it nailed from the test_data"""
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
