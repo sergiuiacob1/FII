@@ -6,17 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import random
 from neural_network import NeuralNetwork
-
-
-def getTrainAndTestData():
-    with gzip.open('mnist.pkl.gz', 'rb') as f:
-        # use encoding for python2
-        trainSet, validSet, testSet = _pickle.load(f, encoding='iso-8859-1')
-
-    # concatenez trainSet cu validSet
-    trainSet = (np.array(list(trainSet[0]) + list(validSet[0])),
-                np.array(list(trainSet[1]) + list(validSet[1])))
-    return trainSet, testSet
+from mnist_loader import load_data_wrapper
 
 
 def saveResults(model):
@@ -34,11 +24,14 @@ def getSavedResults():
 
 def main():
     print('Getting train, validation and test data...')
-    trainData, testData = getTrainAndTestData()
-    model = NeuralNetwork((784, 100, 10))
-    model.fit(X=trainData[0], y=trainData[1],
-              epochs=10, miniBatchSize=10, eta=0.01)
-    accuracy = model.predict(testData)
+    # trainData, testData = getTrainAndTestData()
+    trainData, validationData, testData = load_data_wrapper()
+    trainData += validationData
+    model = NeuralNetwork((784, 30, 10))
+    model.fit(trainData=trainData, testData=testData,
+              epochs=10, miniBatchSize=10, eta=0.5, regularizationValue=5.0)
+    predictions = model.predict([item[0] for item in testData])
+    accuracy = sum([int(prediction == truth) for prediction, truth in zip(predictions, [item[1] for item in testData])]) / len(testData) * 100
     print(f'Model has an accuracy of {accuracy}')
 
     saveResults(model)
