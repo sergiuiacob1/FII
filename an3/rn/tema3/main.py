@@ -7,6 +7,8 @@ import matplotlib.cm as cm
 import random
 from neural_network import NeuralNetwork
 from mnist_loader import load_data_wrapper
+import matplotlib.pyplot as plt
+
 
 
 def save_results(model):
@@ -36,6 +38,15 @@ def main():
     # print(f'Model has an accuracy of {accuracy}')
 
     save_results(model)
+
+    plt.figure(1)
+    plt.plot (model.accuracies["training_data"])
+    plt.figure(2)
+    plt.plot (model.accuracies["test_data"])
+    plt.figure(3)
+    plt.plot (model.costs)
+
+
 
 
 if __name__ == '__main__':

@@ -24,6 +24,10 @@ class NeuralNetwork(object):
 
     def fit(self, training_data, epochs, mini_batch_size, eta,
             test_data=None, regularization_parameter=0.1, p_dropout=0.2, beta_momentum=0.9):
+        self.accuracies = {}
+        self.accuracies["test_data"] = []
+        self.accuracies["training_data"] = []
+        self.costs = []
         for j in range(epochs):
             # shuffle
             random.shuffle(training_data)
@@ -33,10 +37,36 @@ class NeuralNetwork(object):
                 self.update_mini_batch(
                     mini_batch, eta, len(training_data), regularization_parameter, p_dropout, beta_momentum)
             if test_data:
-                print("Epoch {0}: {1} / {2}".format(j,
-                                                    self.get_nailed_cases(test_data), len(test_data)))
+                accuracy = self.get_nailed_cases(test_data)/len(test_data)
+                self.accuracies["test_data"].append(accuracy)
+                print(
+                    f'Test data accuracy on epoch {j}/{epochs}: {accuracy * 100}')
+
+                accuracy = self.get_nailed_cases(
+                    training_data, True)/len(training_data)
+                self.accuracies["training_data"].append(accuracy)
+                print(
+                    f'Training data accuracy on epoch {j}/{epochs}: {accuracy * 100}')
+
+                self.costs.append(self.calculate_cost(training_data))
+                print(
+                    f'Training data cost on epoch {j}/{epochs}: {self.costs[-1]}')
             else:
-                print("Epoch {0} complete".format(j))
+                print(f"Epoch {j} complete")
+            print ("\n")
+
+    def calculate_cost(self, data):
+        cost = 0
+        for x, t in data:
+            # t is the truth, y are my activations
+            y = self.feedforward(x)
+            cost += sum(np.multiply(t, np.log(y))) + \
+                sum(np.multiply(np.subtract(1, t), np.log(np.subtract(1, y))))
+        cost *= -1/len(data)
+        return cost
+
+    def get_predictions(self, X):
+        return [np.argmax(self.feedforward(x)) for x in X]
 
     def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout, beta_momentum):
         """
@@ -66,15 +96,15 @@ class NeuralNetwork(object):
         self.biases = [b-(eta/len(mini_batch))*nb
                        for b, nb in zip(self.biases, momentum_nabla_b)]
 
-        self.apply_maxnorm()
+        # self.apply_maxnorm()
 
     def apply_maxnorm(self):
         c = 5
         epsilon = 10 ** (-8)
         # for each hidden layer
-        for l in range (1, self.no_of_layers - 1):
+        for l in range(1, self.no_of_layers - 1):
             # for each neuron in this layer, update the weights that determine his value
-            for i in range (0, self.layer_dimensions[l]):
+            for i in range(0, self.layer_dimensions[l]):
                 w_neuron = self.weights[l-1][i]
                 value = np.sqrt(sum([w**2 for w in w_neuron]))
                 if value > c:
@@ -117,9 +147,9 @@ class NeuralNetwork(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def get_nailed_cases(self, test_data):
+    def get_nailed_cases(self, test_data, y_is_vectorized=False):
         """Returns how many cases it nailed from the test_data"""
-        test_results = [(np.argmax(self.feedforward(x)), y)
+        test_results = [(np.argmax(self.feedforward(x)), y if y_is_vectorized==False else np.argmax(y))
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
