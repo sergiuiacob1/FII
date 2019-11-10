@@ -23,7 +23,7 @@ class NeuralNetwork(object):
         return a
 
     def fit(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None, regularization_parameter=0.1):
+            test_data=None, regularization_parameter=0.1, p_dropout=0.2):
         if test_data:
             n_test = len(test_data)
         n = len(training_data)
@@ -34,14 +34,14 @@ class NeuralNetwork(object):
                             for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(
-                    mini_batch, eta, n, regularization_parameter)
+                    mini_batch, eta, n, regularization_parameter, p_dropout)
             if test_data:
                 print("Epoch {0}: {1} / {2}".format(j,
                                                     self.evaluate(test_data), n_test))
             else:
                 print("Epoch {0} complete".format(j))
 
-    def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter):
+    def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout):
         """
         Update the network's weights and biases by applying gradient descent using backpropagation
         to a single mini batch. The "mini_batch" is a list of tuples "(x,y)" and "eta" is the learning
@@ -50,7 +50,7 @@ class NeuralNetwork(object):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y, p_dropout)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         # Applying L2 Regularization
@@ -59,7 +59,7 @@ class NeuralNetwork(object):
         self.biases = [b-(eta/len(mini_batch))*nb
                        for b, nb in zip(self.biases, nabla_b)]
 
-    def backprop(self, x, y):
+    def backprop(self, x, y, p_dropout):
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
         gradient for the cost function C_x.  ``nabla_b`` and
         ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
@@ -74,6 +74,12 @@ class NeuralNetwork(object):
             z = np.dot(w, activation)+b
             zs.append(z)
             activation = sigmoid(z)
+            # Using dropout on activations
+            dropout = np.array(np.random.binomial(
+                size=len(activation), n=1, p=p_dropout)).reshape((len(activation), 1))
+            activation = np.multiply(activation, dropout)
+            activation = np.multiply(activation, 1.0/(1.0-p_dropout))
+            
             activations.append(activation)
         # Using softmax for the last layer
         # Course 4, slide 27
