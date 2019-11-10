@@ -10,7 +10,6 @@ from mnist_loader import load_data_wrapper
 import matplotlib.pyplot as plt
 
 
-
 def save_results(model):
     print('Serializing model...')
     with open('model.pkl', 'wb') as f:
@@ -31,22 +30,23 @@ def main():
     # good params:
     # model.fit(training_data=train_data, test_data=test_data,
     #           epochs=30, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
+
     model.fit(training_data=train_data, test_data=test_data,
-              epochs=5, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
-    # predictions = model.predict([item[0] for item in testData])
-    # accuracy = sum([int(prediction == truth) for prediction, truth in zip(predictions, [item[1] for item in testData])]) / len(testData) * 100
-    # print(f'Model has an accuracy of {accuracy}')
+              epochs=15, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
 
     save_results(model)
+    # model = get_saved_results()
 
-    plt.figure(1)
-    plt.plot (model.accuracies["training_data"])
-    plt.figure(2)
-    plt.plot (model.accuracies["test_data"])
-    plt.figure(3)
-    plt.plot (model.costs)
-
-
+    fig = plt.figure(1)
+    fig.canvas.set_window_title('Training Data Accuracy')
+    plt.plot(model.accuracies["training_data"])
+    fig = plt.figure(2)
+    fig.canvas.set_window_title('Test Data Accuracy')
+    plt.plot(model.accuracies["test_data"])
+    fig = plt.figure(3)
+    fig.canvas.set_window_title('Training Data Costs')
+    plt.plot(model.costs)
+    plt.show()
 
 
 if __name__ == '__main__':
