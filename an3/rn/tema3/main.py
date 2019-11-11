@@ -29,22 +29,21 @@ def main():
     model = NeuralNetwork((784, 100, 10))
     # good params:
     # model.fit(training_data=train_data, test_data=test_data,
-    #           epochs=30, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
+    #           epochs=50, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
 
-    model.fit(training_data=train_data, test_data=test_data,
-              epochs=15, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
+    model.fit(training_data=train_data, test_data=test_data, epochs=50, mini_batch_size=10,
+              eta=0.5, regularization_parameter=2.5, p_dropout=0.25, beta_momentum=0.9, use_maxnorm=False)
 
     save_results(model)
     # model = get_saved_results()
 
     fig = plt.figure(1)
-    fig.canvas.set_window_title('Training Data Accuracy')
+    fig.canvas.set_window_title('Accuracy')
     plt.plot(model.accuracies["training_data"])
-    fig = plt.figure(2)
-    fig.canvas.set_window_title('Test Data Accuracy')
     plt.plot(model.accuracies["test_data"])
-    fig = plt.figure(3)
-    fig.canvas.set_window_title('Training Data Costs')
+    plt.legend(['Training data accuracy', 'Test data accuracy'])
+    fig = plt.figure(2)
+    fig.canvas.set_window_title('Cost on training data')
     plt.plot(model.costs)
     plt.show()
 

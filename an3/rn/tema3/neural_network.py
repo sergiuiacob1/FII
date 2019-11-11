@@ -23,7 +23,7 @@ class NeuralNetwork(object):
         return a
 
     def fit(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None, regularization_parameter=0.1, p_dropout=0.2, beta_momentum=0.9):
+            test_data=None, regularization_parameter=0.1, p_dropout=0.2, beta_momentum=0.9, use_maxnorm=False):
         self.accuracies = {}
         self.accuracies["test_data"] = []
         self.accuracies["training_data"] = []
@@ -35,7 +35,7 @@ class NeuralNetwork(object):
                             for k in range(0, len(training_data), mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(
-                    mini_batch, eta, len(training_data), regularization_parameter, p_dropout, beta_momentum)
+                    mini_batch, eta, len(training_data), regularization_parameter, p_dropout, beta_momentum, use_maxnorm)
             if test_data:
                 accuracy = self.get_nailed_cases(test_data)/len(test_data)
                 self.accuracies["test_data"].append(accuracy)
@@ -60,15 +60,14 @@ class NeuralNetwork(object):
         for x, t in data:
             # t is the truth, y are my activations
             y = self.feedforward(x)
-            cost += sum(np.multiply(t, np.log(y))) + \
-                sum(np.multiply(np.subtract(1, t), np.log(np.subtract(1, y))))
+            cost += sum(np.multiply(t, np.log(y)))
         cost *= -1/len(data)
         return cost
 
     def get_predictions(self, X):
         return [np.argmax(self.feedforward(x)) for x in X]
 
-    def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout, beta_momentum):
+    def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout, beta_momentum, use_maxnorm):
         """
         Update the network's weights and biases by applying gradient descent using backpropagation
         to a single mini batch. The "mini_batch" is a list of tuples "(x,y)" and "eta" is the learning
@@ -96,7 +95,8 @@ class NeuralNetwork(object):
         self.biases = [b-(eta/len(mini_batch))*nb
                        for b, nb in zip(self.biases, momentum_nabla_b)]
 
-        # self.apply_maxnorm()
+        if use_maxnorm is True:
+            self.apply_maxnorm()
 
     def apply_maxnorm(self):
         c = 5
