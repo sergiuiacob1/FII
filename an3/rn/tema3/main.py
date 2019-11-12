@@ -31,8 +31,12 @@ def main():
     # model.fit(training_data=train_data, test_data=test_data,
     #           epochs=50, mini_batch_size=10, eta=0.5, regularization_parameter=5.0, p_dropout=0.5, beta_momentum=0.1)
 
+    # also good:
+    # model.fit(training_data=train_data, test_data=test_data, epochs=50, mini_batch_size=10,
+    #           eta=0.75, regularization_parameter=2.5, p_dropout=0.5, beta_momentum=0.1, use_maxnorm=False)
+    
     model.fit(training_data=train_data, test_data=test_data, epochs=50, mini_batch_size=10,
-              eta=0.5, regularization_parameter=2.5, p_dropout=0.25, beta_momentum=0.9, use_maxnorm=False)
+              eta=0.75, regularization_parameter=2.5, p_dropout=0.5, beta_momentum=0.1, use_maxnorm=False)
 
     save_results(model)
     # model = get_saved_results()
