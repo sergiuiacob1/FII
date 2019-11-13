@@ -55,11 +55,11 @@ def main():
     #           eta=0.75, regularization_parameter=2.5, p_dropout=0.5, beta_momentum=0.1, use_maxnorm=False)
 
     parameters = {
-        "epochs": 10,
+        "epochs": 50,
         "mini_batch_size": 64,
-        "eta": 0.05,
+        "eta": 0.75,
         "regularization_parameter": 5.0,
-        "p_dropout": 0.2,
+        "p_dropout": 0.5,
         "beta_momentum": 0.9,
         "use_maxnorm": False
     }
@@ -68,9 +68,11 @@ def main():
     # 14 merita lasat la antrenat
     # 15 merita mai mult
     # 16 si mai mult
+    # 17 e ce trebuie
+    # 18 a depasit 95%
 
     model.fit(training_data=train_data, test_data=test_data, **parameters)
-    no = 15
+    no = 19
     save_results(model, f"model_{no}.pkl", parameters)
 
     for i in range(no, no + 1):
