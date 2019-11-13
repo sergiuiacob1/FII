@@ -1,0 +1,1 @@
+{"model_2.pkl": {"epochs": 1, "mini_batch_size": 5000, "eta": 5.0, "regularization_parameter": 2.5, "p_dropout": 0.0, "beta_momentum": 0.0, "use_maxnorm": false}}

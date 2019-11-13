@@ -22,8 +22,8 @@ class NeuralNetwork(object):
             a = sigmoid(np.dot(w, a) + b)
         return a
 
-    def fit(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None, regularization_parameter=0.1, p_dropout=0.2, beta_momentum=0.9, use_maxnorm=False):
+    def fit(self, training_data, epochs, mini_batch_size, eta=0.75,
+            test_data=None, regularization_parameter=2.5, p_dropout=0.0, beta_momentum=0.0, use_maxnorm=False):
         self.accuracies = {}
         self.accuracies["test_data"] = []
         self.accuracies["training_data"] = []
@@ -53,7 +53,7 @@ class NeuralNetwork(object):
                     f'Training data cost on epoch {j}/{epochs}: {self.costs[-1]}')
             else:
                 print(f"Epoch {j} complete")
-            print ("\n")
+            print("\n")
 
     def calculate_cost(self, data):
         cost = 0
@@ -68,11 +68,6 @@ class NeuralNetwork(object):
         return [np.argmax(self.feedforward(x)) for x in X]
 
     def update_mini_batch(self, mini_batch, eta, training_data_length, regularization_parameter, p_dropout, beta_momentum, use_maxnorm):
-        """
-        Update the network's weights and biases by applying gradient descent using backpropagation
-        to a single mini batch. The "mini_batch" is a list of tuples "(x,y)" and "eta" is the learning
-        rate.
-        """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         momentum_nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -80,8 +75,8 @@ class NeuralNetwork(object):
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.back_propagation(
                 x, y, p_dropout)
-            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
-            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+            nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
+            nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         # Applying momentum
         momentum_nabla_b = np.multiply(
             momentum_nabla_b, beta_momentum) + np.multiply(nabla_b, 1 - beta_momentum)
@@ -149,7 +144,7 @@ class NeuralNetwork(object):
 
     def get_nailed_cases(self, test_data, y_is_vectorized=False):
         """Returns how many cases it nailed from the test_data"""
-        test_results = [(np.argmax(self.feedforward(x)), y if y_is_vectorized==False else np.argmax(y))
+        test_results = [(np.argmax(self.feedforward(x)), y if y_is_vectorized == False else np.argmax(y))
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
