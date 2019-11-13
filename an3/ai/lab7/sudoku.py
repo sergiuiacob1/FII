@@ -61,7 +61,6 @@ class Sudoku:
         assert self.is_consistent(), "Board is not consistent!"
 
         if self.is_complete() is True:
-            print('I am done')
             return True
 
         # pick a variable that doesn't have a value assigned
@@ -69,12 +68,11 @@ class Sudoku:
         unassigned_variables = [
             var for var in self.variables if var.value is None]
 
-        if (len(unassigned_variables) < 2):
-            print ('yayaay')
+        # another optimization: choose the first variable with the least possible values
+        unassigned_variables.sort(key = lambda x: len(x.domain))
+        random_var = unassigned_variables[0]
+        # random_var = random.choice(unassigned_variables)
 
-        # TODO pick first the variables with least choices
-
-        random_var = random.choice(unassigned_variables)
         # trying to give it each value
         for value in tuple(random_var.domain):
             random_var.value = value
@@ -85,12 +83,14 @@ class Sudoku:
 
             if res is True:
                 # I managed to fill up the whole board!!!
-                return
+                return True
 
             self.forward_checking(random_var, value_removed=value)
             random_var.value = None
             self.board[random_var.line][random_var.column] = 0
             random_var.domain.add(value)
+        
+        return False
 
     def forward_checking(self, variable: Variable, value_added=None, value_removed=None):
         """
@@ -147,8 +147,8 @@ class Sudoku:
             self.board[i] = [0 for _ in range(0, 9)]
         # list(product(...)) will generate tuples: (0, 0), (0, 1), ..., (0, 8), (1, 0), ..., (1, 8), ..., (8, 8)
         # which are positions on the board
-        self.variables = [Variable(pos[0], pos[1])
-                          for pos in list(product([i for i in range(0, 9)], repeat=2))]
+        # self.variables = [Variable(pos[0], pos[1])
+        #                   for pos in list(product([i for i in range(0, 9)], repeat=2))]
 
         i = 0
         with open('board.txt', 'r') as f:

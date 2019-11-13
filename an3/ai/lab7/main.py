@@ -8,4 +8,5 @@ if __name__ == '__main__':
     if sudoku.is_consistent() is False:
         raise Exception('Sudoku board is not consistent!')
     sudoku.solve()
+    assert sudoku.is_complete() and sudoku.is_consistent(), "Aoleo buba"
     sudoku.print_board()
