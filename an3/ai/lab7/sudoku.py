@@ -35,6 +35,9 @@ class Sudoku:
             neighbours = self.get_variable_neighbours(variable)
             # if my constraint
             if any(neighbour.value == variable.value for neighbour in neighbours):
+                self.print_board()
+                print(
+                    f'Not consistent on position ({variable.line + 1}, {variable.column + 1})')
                 return False
         return True
 
@@ -55,10 +58,10 @@ class Sudoku:
         print('\n')
 
     def solve(self):
-        assert (self.is_consistent(), "Board is not consistent!")
+        assert self.is_consistent(), "Board is not consistent!"
 
-        if self.is_complete():
-            # Done!!!
+        if self.is_complete() is True:
+            print('I am done')
             return True
 
         # pick a variable that doesn't have a value assigned
@@ -66,17 +69,28 @@ class Sudoku:
         unassigned_variables = [
             var for var in self.variables if var.value is None]
 
+        if (len(unassigned_variables) < 2):
+            print ('yayaay')
+
         # TODO pick first the variables with least choices
 
         random_var = random.choice(unassigned_variables)
         # trying to give it each value
         for value in tuple(random_var.domain):
+            random_var.value = value
+            self.board[random_var.line][random_var.column] = value
+            random_var.domain.discard(value)
             self.forward_checking(random_var, value_added=value)
             res = self.solve()
+
             if res is True:
                 # I managed to fill up the whole board!!!
                 return
+
             self.forward_checking(random_var, value_removed=value)
+            random_var.value = None
+            self.board[random_var.line][random_var.column] = 0
+            random_var.domain.add(value)
 
     def forward_checking(self, variable: Variable, value_added=None, value_removed=None):
         """
@@ -90,17 +104,17 @@ class Sudoku:
         neighbours = self.get_variable_neighbours(variable)
 
         if value_added is not None:
-            variable.value = value_added
-            variable.domain.discard(value_added)
+            # variable.value = value_added
+            # variable.domain.discard(value_added)
             # Put the value on the board, yo!
-            self.board[variable.line][variable.column] = value_added
+            # self.board[variable.line][variable.column] = value_added
             for neighbour in neighbours:
                 neighbour.domain.discard(value_added)
         elif value_removed is not None:
-            variable.value = None
-            variable.domain.add(value_removed)
+            # variable.value = None
+            # variable.domain.add(value_removed)
             # Remove the value from the board, yo!
-            self.board[variable.line][variable.column] = 0
+            # self.board[variable.line][variable.column] = 0
             for neighbour in neighbours:
                 neighbour.domain.add(value_added)
 
@@ -114,6 +128,8 @@ class Sudoku:
         neighbours = []
         variable_square = self.get_variable_square(variable)
         for neighbour in self.variables:
+            if neighbour is variable:
+                continue
             neighbour_square = self.get_variable_square(neighbour)
             if neighbour.line == variable.line or neighbour.column == variable.column or neighbour_square == variable_square:
                 neighbours.append(neighbour)
@@ -134,6 +150,29 @@ class Sudoku:
         self.variables = [Variable(pos[0], pos[1])
                           for pos in list(product([i for i in range(0, 9)], repeat=2))]
 
+        i = 0
+        with open('board.txt', 'r') as f:
+            for line in f:
+                numbers = line.split(' ')
+                numbers = [int(x) for x in numbers]
+                self.board[i] = numbers
+                i += 1
+
+        self.variables = []
+        for i in range(0, 9):
+            for j in range(0, 9):
+                var = Variable(i, j)
+                var.value = self.board[i][j] if self.board[i][j] > 0 else None
+                self.variables.append(var)
+
+        # update variable domains
+        for var in self.variables:
+            neighbours = self.get_variable_neighbours(var)
+            for neighbour in neighbours:
+                var.domain.discard(neighbour.value)
+            var.domain.discard(var.value)
+        return
+
         # this is a list with indexes for variables that don't have a value assigned
         unassigned_variables = [i for i in range(0, len(self.variables))]
 
@@ -146,7 +185,7 @@ class Sudoku:
 
         i = 0
         while (i < no_of_completed_cells):
-            assert (self.is_consistent(), "Initial board is not consistent!")
+            assert self.is_consistent(), "Initial board is not consistent!"
             # pick a random unassigned variable
             choice = random.choice(unassigned_variables)
             random_var = self.variables[choice]
@@ -158,8 +197,15 @@ class Sudoku:
             neighbours = self.get_variable_neighbours(random_var)
             # If there's any neighbour whose only choice left is this value_assigned
             # then clearly that neighbour wouldn't be able to get any other value
-            if any(len(tuple(neighbour.domain)) == 1 and value_assigned in neighbour and neighbour.value is None for neighbour in neighbours):
+            yes = False
+            for neighbour in neighbours:
+                if len(neighbour.domain) == 1 and neighbour.value is None and value_assigned in neighbour.domain:
+                    yes = True
+                    break
+            if yes is True:
                 continue
+            # if any(len(tuple(neighbour.domain)) == 1 and value_assigned in neighbour and neighbour.value is None for neighbour in neighbours):
+            #     continue
 
             unassigned_variables.remove(choice)
             self.forward_checking(random_var, value_added=value_assigned)
