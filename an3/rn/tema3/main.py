@@ -55,9 +55,9 @@ def main():
     #           eta=0.75, regularization_parameter=2.5, p_dropout=0.5, beta_momentum=0.1, use_maxnorm=False)
 
     parameters = {
-        "epochs": 50,
-        "mini_batch_size": 64,
-        "eta": 0.75,
+        "epochs": 75,
+        "mini_batch_size": 32,
+        "eta": 0.5,
         "regularization_parameter": 5.0,
         "p_dropout": 0.5,
         "beta_momentum": 0.9,
@@ -70,12 +70,13 @@ def main():
     # 16 si mai mult
     # 17 e ce trebuie
     # 18 a depasit 95%
+    # la fel si 20
 
     model.fit(training_data=train_data, test_data=test_data, **parameters)
-    no = 19
+    no = 20
     save_results(model, f"model_{no}.pkl", parameters)
 
-    for i in range(no, no + 1):
+    for i in range(1, no + 1):
         model = get_saved_results(f"model_{i}.pkl")
         show_plots(model, i)
 
