@@ -28,12 +28,16 @@ class NeuralNetwork(object):
         self.accuracies["test_data"] = []
         self.accuracies["training_data"] = []
         self.costs = []
+        no_of_mini_batches = len(training_data)//mini_batch_size
+        if len(training_data) % mini_batch_size > 0:
+            no_of_mini_batches += 1
+
         for j in range(epochs):
             # shuffle
             random.shuffle(training_data)
-            mini_batches = [training_data[k:k + mini_batch_size]
-                            for k in range(0, len(training_data), mini_batch_size)]
-            for mini_batch in mini_batches:
+            for i in range(0, no_of_mini_batches):
+                mini_batch = training_data[i *
+                                           mini_batch_size: (i + 1)*mini_batch_size]
                 self.update_mini_batch(
                     mini_batch, eta, len(training_data), regularization_parameter, p_dropout, beta_momentum, use_maxnorm)
             if test_data:
@@ -78,17 +82,22 @@ class NeuralNetwork(object):
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         # Applying momentum
-        momentum_nabla_b = np.multiply(
-            momentum_nabla_b, beta_momentum) + np.multiply(nabla_b, 1 - beta_momentum)
-        momentum_nabla_w = np.multiply(
-            momentum_nabla_w, beta_momentum) + np.multiply(nabla_w, 1 - beta_momentum)
+        # momentum_nabla_b = np.multiply(
+        #     momentum_nabla_b, beta_momentum) + np.multiply(nabla_b, 1 - beta_momentum)
+        # momentum_nabla_w = np.multiply(
+        #     momentum_nabla_w, beta_momentum) + np.multiply(nabla_w, 1 - beta_momentum)
+
+        momentum_nabla_b = np.multiply(momentum_nabla_b, beta_momentum) - np.multiply(nabla_b, eta)
+        momentum_nabla_w = np.multiply(momentum_nabla_w, beta_momentum) - np.multiply(nabla_w, eta)
+        self.weights = [w + vw for w, vw in zip (self.weights, momentum_nabla_w)]
+        self.biases = [b + vb for b, vb in zip (self.biases, momentum_nabla_b)]
 
         # Applying L2 Regularization
         # update weights and biases
-        self.weights = [(1 - eta * regularization_parameter / training_data_length)*w-(eta/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, momentum_nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, momentum_nabla_b)]
+        # self.weights = [(1 - eta * regularization_parameter / training_data_length)*w-(eta/len(mini_batch))*nw
+        #                 for w, nw in zip(self.weights, momentum_nabla_w)]
+        # self.biases = [b-(eta/len(mini_batch))*nb
+        #                for b, nb in zip(self.biases, momentum_nabla_b)]
 
         if use_maxnorm is True:
             self.apply_maxnorm()
@@ -113,11 +122,12 @@ class NeuralNetwork(object):
         activation = x
         activations = [x]  # list to store all the activations, layer by layer
         zs = []  # list to store all the z vectors, layer by layer
-        for b, w in zip(self.biases, self.weights):
+        for index, (b, w) in enumerate(zip(self.biases, self.weights)):
             z = np.dot(w, activation)+b
             zs.append(z)
             activation = sigmoid(z)
-            # Using dropout on activations
+            # Using dropout on activations, but only on hidden layers
+            # if index < self.no_of_layers - 1:
             dropout = np.array(np.random.binomial(
                 size=len(activation), n=1, p=p_dropout)).reshape((len(activation), 1))
             activation = np.multiply(activation, dropout)

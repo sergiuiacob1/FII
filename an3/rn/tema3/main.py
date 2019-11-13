@@ -20,7 +20,7 @@ def save_results(model, model_name, model_parameters):
         params = json.load(f)
     params[model_name] = model_parameters
     with open('model_parameters.json', 'w') as f:
-        f.write(json.dump(params, f))
+        f.write(json.dumps(params))
 
 
 def get_saved_results(model_name='model.pkl'):
@@ -29,16 +29,18 @@ def get_saved_results(model_name='model.pkl'):
         model = joblib.load(f)
     return model
 
-def show_plots(model):
-    fig = plt.figure(1)
-    fig.canvas.set_window_title('Accuracy')
+
+def show_plots(model, no):
+    fig = plt.figure(no*10 + 1)
+    fig.canvas.set_window_title(f'{no} - Accuracy')
     plt.plot(model.accuracies["training_data"])
     plt.plot(model.accuracies["test_data"])
     plt.legend(['Training data accuracy', 'Test data accuracy'])
-    fig = plt.figure(2)
-    fig.canvas.set_window_title('Cost on training data')
+    fig = plt.figure(no * 10 + 2)
+    fig.canvas.set_window_title(f'{no} - Cost on training data')
     plt.plot(model.costs)
     plt.show()
+
 
 def main():
     print('Getting train, validation and test data...')
@@ -53,20 +55,22 @@ def main():
     #           eta=0.75, regularization_parameter=2.5, p_dropout=0.5, beta_momentum=0.1, use_maxnorm=False)
 
     parameters = {
-        "epochs": 1,
-        "mini_batch_size": 5000,
-        "eta": 5.0,
-        "regularization_parameter": 2.5,
+        "epochs": 10,
+        "mini_batch_size": 10,
+        "eta": 0.1,
+        "regularization_parameter": 5.0,
         "p_dropout": 0.0,
-        "beta_momentum": 0.0,
+        "beta_momentum": 0.9,
         "use_maxnorm": False
-
     }
-    model.fit(training_data = train_data, test_data=test_data, **parameters)
-    save_results(model, "model_2.pkl", parameters)
-    model = get_saved_results("model.pkl")
 
-    show_plots (model)
+    model.fit(training_data=train_data, test_data=test_data, **parameters)
+    no = 13
+    save_results(model, f"model_{no}.pkl", parameters)
+
+    for i in range(no, no + 1):
+        model = get_saved_results(f"model_{i}.pkl")
+        show_plots(model, i)
 
 
 if __name__ == '__main__':
