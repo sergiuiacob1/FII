@@ -56,16 +56,21 @@ def main():
 
     parameters = {
         "epochs": 10,
-        "mini_batch_size": 10,
-        "eta": 0.1,
+        "mini_batch_size": 64,
+        "eta": 0.05,
         "regularization_parameter": 5.0,
-        "p_dropout": 0.0,
+        "p_dropout": 0.2,
         "beta_momentum": 0.9,
         "use_maxnorm": False
     }
 
+    # 13 e bun
+    # 14 merita lasat la antrenat
+    # 15 merita mai mult
+    # 16 si mai mult
+
     model.fit(training_data=train_data, test_data=test_data, **parameters)
-    no = 13
+    no = 15
     save_results(model, f"model_{no}.pkl", parameters)
 
     for i in range(no, no + 1):

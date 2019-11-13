@@ -1,1 +1,119 @@
-{"model_2.pkl": {"epochs": 15, "mini_batch_size": 50, "eta": 5.0, "regularization_parameter": 5.0, "p_dropout": 0.2, "beta_momentum": 0.9, "use_maxnorm": true}, "model_3.pkl": {"epochs": 15, "mini_batch_size": 10, "eta": 0.1, "regularization_parameter": 2.5, "p_dropout": 0.0, "beta_momentum": 0.9, "use_maxnorm": false}, "model_4.pkl": {"epochs": 15, "mini_batch_size": 10, "eta": 0.01, "regularization_parameter": 2.5, "p_dropout": 0.0, "beta_momentum": 0.9, "use_maxnorm": false}, "model_5.pkl": {"epochs": 30, "mini_batch_size": 500, "eta": 5.0, "regularization_parameter": 3, "p_dropout": 0.5, "beta_momentum": 0.9, "use_maxnorm": true}, "model_6.pkl": {"epochs": 50, "mini_batch_size": 500, "eta": 3.5, "regularization_parameter": 3, "p_dropout": 0.5, "beta_momentum": 0.9, "use_maxnorm": true}, "model_7.pkl": {"epochs": 25, "mini_batch_size": 50, "eta": 3.5, "regularization_parameter": 3, "p_dropout": 0.2, "beta_momentum": 0.9, "use_maxnorm": true}, "model_8.pkl": {"epochs": 25, "mini_batch_size": 10, "eta": 0.05, "regularization_parameter": 5.0, "p_dropout": 0.0, "beta_momentum": 0.9, "use_maxnorm": false}, "model_9.pkl": {"epochs": 25, "mini_batch_size": 10, "eta": 0.1, "regularization_parameter": 5.0, "p_dropout": 0.0, "beta_momentum": 0.9, "use_maxnorm": false}, "model_10.pkl": {"epochs": 25, "mini_batch_size": 10, "eta": 0.01, "regularization_parameter": 5.0, "p_dropout": 0.0, "beta_momentum": 0.9, "use_maxnorm": false}, "model_11.pkl": {"epochs": 25, "mini_batch_size": 10, "eta": 0.01, "regularization_parameter": 5.0, "p_dropout": 0.0, "beta_momentum": 0.1, "use_maxnorm": false}}
+{
+    "model_2.pkl": {
+        "epochs": 15,
+        "mini_batch_size": 50,
+        "eta": 5.0,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.2,
+        "beta_momentum": 0.9,
+        "use_maxnorm": true
+    },
+    "model_3.pkl": {
+        "epochs": 15,
+        "mini_batch_size": 10,
+        "eta": 0.1,
+        "regularization_parameter": 2.5,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    },
+    "model_4.pkl": {
+        "epochs": 15,
+        "mini_batch_size": 10,
+        "eta": 0.01,
+        "regularization_parameter": 2.5,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    },
+    "model_5.pkl": {
+        "epochs": 30,
+        "mini_batch_size": 500,
+        "eta": 5.0,
+        "regularization_parameter": 3,
+        "p_dropout": 0.5,
+        "beta_momentum": 0.9,
+        "use_maxnorm": true
+    },
+    "model_6.pkl": {
+        "epochs": 50,
+        "mini_batch_size": 500,
+        "eta": 3.5,
+        "regularization_parameter": 3,
+        "p_dropout": 0.5,
+        "beta_momentum": 0.9,
+        "use_maxnorm": true
+    },
+    "model_7.pkl": {
+        "epochs": 25,
+        "mini_batch_size": 50,
+        "eta": 3.5,
+        "regularization_parameter": 3,
+        "p_dropout": 0.2,
+        "beta_momentum": 0.9,
+        "use_maxnorm": true
+    },
+    "model_8.pkl": {
+        "epochs": 25,
+        "mini_batch_size": 10,
+        "eta": 0.05,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    },
+    "model_9.pkl": {
+        "epochs": 25,
+        "mini_batch_size": 10,
+        "eta": 0.1,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    },
+    "model_10.pkl": {
+        "epochs": 25,
+        "mini_batch_size": 10,
+        "eta": 0.01,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    },
+    "model_11.pkl": {
+        "epochs": 25,
+        "mini_batch_size": 10,
+        "eta": 0.01,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.1,
+        "use_maxnorm": false
+    },
+    "model_12.pkl": {
+        "epochs": 10,
+        "mini_batch_size": 10,
+        "eta": 0.1,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.1,
+        "use_maxnorm": false
+    },
+    "model_13.pkl": {
+        "epochs": 10,
+        "mini_batch_size": 10,
+        "eta": 0.1,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    },
+    "model_14.pkl": {
+        "epochs": 10,
+        "mini_batch_size": 10,
+        "eta": 0.01,
+        "regularization_parameter": 5.0,
+        "p_dropout": 0.0,
+        "beta_momentum": 0.9,
+        "use_maxnorm": false
+    }
+}

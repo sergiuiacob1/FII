@@ -81,17 +81,23 @@ class NeuralNetwork(object):
                 x, y, p_dropout)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+
+        # Momentum + L2 regularization
+        momentum_nabla_b = np.multiply(
+            momentum_nabla_b, beta_momentum) - np.multiply(nabla_b, eta/len(mini_batch))
+        momentum_nabla_w = np.multiply(
+            momentum_nabla_w, beta_momentum) - np.multiply(nabla_w, eta/len(mini_batch))
+        regularization_value = (
+            1 - eta * regularization_parameter / training_data_length)
+        self.weights = [regularization_value * w + vw for w,
+                        vw in zip(self.weights, momentum_nabla_w)]
+        self.biases = [b + vb for b, vb in zip(self.biases, momentum_nabla_b)]
+
         # Applying momentum
         # momentum_nabla_b = np.multiply(
         #     momentum_nabla_b, beta_momentum) + np.multiply(nabla_b, 1 - beta_momentum)
         # momentum_nabla_w = np.multiply(
         #     momentum_nabla_w, beta_momentum) + np.multiply(nabla_w, 1 - beta_momentum)
-
-        momentum_nabla_b = np.multiply(momentum_nabla_b, beta_momentum) - np.multiply(nabla_b, eta)
-        momentum_nabla_w = np.multiply(momentum_nabla_w, beta_momentum) - np.multiply(nabla_w, eta)
-        self.weights = [w + vw for w, vw in zip (self.weights, momentum_nabla_w)]
-        self.biases = [b + vb for b, vb in zip (self.biases, momentum_nabla_b)]
-
         # Applying L2 Regularization
         # update weights and biases
         # self.weights = [(1 - eta * regularization_parameter / training_data_length)*w-(eta/len(mini_batch))*nw
