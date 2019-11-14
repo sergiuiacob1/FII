@@ -35,18 +35,18 @@ void generateNumbers(HANDLE handle) {
 
 	// creez evenimentul pentru scriere in MappedFile
 	printf("P1 - Creating handle for event\n");
-	HANDLE hEvent = CreateEvent(NULL, true, FALSE, "access_mapped_file");
-	HANDLE hCheckEvent = CreateEvent(NULL, true, FALSE, "check_event");
+	HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, "access_mapped_file");
+	HANDLE hCheckEvent = CreateEvent(NULL, FALSE, FALSE, "check_event");
 
 	// scriu care e PID-ul acestui proces ca sa ma pot atasa la consola
-	writeToMappedFile(pData, hEvent, (int)GetCurrentProcessId(), 0);
+	writeToMappedFile(pData, hEvent, (int)GetCurrentProcessId(), 1);
 
 	// scriu in mapped file cate numere am
 	howMany = 5;
 	printf("P1 - I have a total of %d numbers\n", howMany);
-	writeToMappedFile(pData, hEvent, howMany, 1);
+	writeToMappedFile(pData, hEvent, howMany, 2);
 
-	for (int i = 2; i <= howMany + 1; ++i) {
+	for (int i = 3; i <= howMany + 2; ++i) {
 		randomNumber = rand() % 1000;
 		half = randomNumber * 1.0f / 2;
 		writeToMappedFile(pData, hEvent, randomNumber, i);
@@ -58,18 +58,20 @@ void generateNumbers(HANDLE handle) {
 }
 
 void waitForCheck(HANDLE hCheckEvent) {
-	WaitForSingleObject(hCheckEvent, LONG_MAX);
+	WaitForSingleObject(hCheckEvent, INFINITE);
 }
 
 void writeToMappedFile(unsigned char * pData, HANDLE hEvent, int number, int index) {
-	double half = number * 1.0f / 2;
+	//Sleep(1000);
+	double half = number / 2;
+	int offset;
 	// scriu dadadadadadaaaaaaaaaaaa
-	printf("P1 - Writing %d and %lf to MappedFile\n", number, half);
-	memcpy(pData + 2 * index * (sizeof(number)), &number, sizeof(number));
-	memcpy(pData + 2 * (index + 1) * sizeof(half), &half, sizeof(half));
+	offset = (index - 1) * sizeof(number) + (index - 1) * sizeof(half);
+	memcpy(pData + offset, &number, sizeof(number));
+	memcpy(pData + offset + sizeof(number), &half, sizeof(half));
 	// semnalizez ca am un eveniment nou, am scris un nou numar
 	SetEvent(hEvent);
-
+	printf("P1 - Wrote %d and %lf to MappedFile\n", number, half);
 }
 
 HANDLE createMappedFile() {

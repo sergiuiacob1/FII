@@ -8,7 +8,7 @@ using namespace std;
 
 HANDLE getMappedFileHandle();
 void checkNumbers(HANDLE);
-int readNumber(HANDLE, unsigned char*, int);
+int readNumber(HANDLE, unsigned char*, int, bool);
 double readHalf(unsigned char*, int);
 
 int main() {
@@ -36,10 +36,10 @@ void checkNumbers(HANDLE hFile) {
 	}
 
 	printf("P2 - Opening write event...\n");
-	HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE, false, "access_mapped_file");
-	HANDLE hCheckEvent = OpenEvent(EVENT_MODIFY_STATE, false, "check_event");
+	HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE | SYNCHRONIZE, false, "access_mapped_file");
+	HANDLE hCheckEvent = OpenEvent(EVENT_MODIFY_STATE | SYNCHRONIZE, false, "check_event");
 
-	pid = readNumber(hEvent, pData, 0);
+	pid = readNumber(hEvent, pData, 1, false);
 	printf("P2 - The first process has PID %d --- Attaching to its console...\n", pid);
 	if (FreeConsole() == false) {
 		printf("P2 - Freeing current console failed: %d\n", GetLastError());
@@ -52,30 +52,34 @@ void checkNumbers(HANDLE hFile) {
 	}
 	printf("P2 - Successfully attached to P1 console!\n");
 
-	howMany = readNumber(hEvent, pData, 1);
-	for (int i = 2; i <= howMany + 1; ++i) {
-		number = readNumber(hEvent, pData, i);
+	howMany = readNumber(hEvent, pData, 2, false);
+	for (int i = 3; i <= howMany + 2; ++i) {
+		number = readNumber(hEvent, pData, i, true);
 		half = readHalf(pData, i);
 
 		printf("P2 - Checking %d and %lf\n", number, half);
 		if (half * 2 == (double)number)
-			printf("P2 - TRUE\n");
+			printf("P2 - Corect\n");
 		else
-			printf("P2 - FALSE\n");
-		//Sleep(500);
+			printf("P2 - Incorect\n");
 		SetEvent(hCheckEvent);
 	}
 }
 
-int readNumber(HANDLE hEvent, unsigned char* pData, int index) {
-	WaitForSingleObject(hEvent, LONG_MAX);
-	int* ptr = (int*)(pData + 2 * index * sizeof(int));
+int readNumber(HANDLE hEvent, unsigned char* pData, int index, bool wait) {
+	if (wait && WaitForSingleObject(hEvent, INFINITE) == WAIT_FAILED)
+		printf("P2 - wait failed: %d\n", GetLastError());
+	int offset = (index - 1) * sizeof(int) + (index - 1) * sizeof(double);
+	int* ptr = (int*)(pData + offset);
 	int number = *ptr;
 	return number;
 }
 
 double readHalf(unsigned char* pData, int index) {
-	double* ptr = (double*)(pData + 2 * (index + 1) * sizeof(double));
+	int offset = (index - 1) * sizeof(int) + (index - 1) * sizeof(double);
+	if (index == 0)
+		offset = 0;
+	double* ptr = (double*)(pData + offset + sizeof(int));
 	double half = *ptr;
 	return half;
 }
