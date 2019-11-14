@@ -113,8 +113,12 @@ void killProcessTree(ProcessList* pData, int pID) {
 		if (handle == INVALID_HANDLE_VALUE) {
 			printf("Handle error: %d\n", GetLastError());
 			continue;
+
+			if (!TerminateProcess(handle, 0)) {
+				printf("Could not terminate process %d\n", children[i]);
+			}
 		}
-		TerminateProcess(handle, 0);
+
 	}
 }
 
