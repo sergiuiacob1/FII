@@ -57,13 +57,16 @@ void checkNumbers(HANDLE hFile) {
 		number = readNumber(hEvent, pData, i, true);
 		half = readHalf(pData, i);
 
-		printf("P2 - Checking %d and %lf\n", number, half);
+		//printf("P2 - Checking %d and %lf: ", number, half);
 		if (half * 2 == (double)number)
-			printf("P2 - Corect\n");
+			printf("P2 - Correct: %d * 2 == %lf\n", number, half);
 		else
-			printf("P2 - Incorect\n");
+			printf("P2 - Incorrect: %d * 2 != %lf\n", number, half);
 		SetEvent(hCheckEvent);
 	}
+
+	CloseHandle(hEvent);
+	CloseHandle(hCheckEvent);
 }
 
 int readNumber(HANDLE hEvent, unsigned char* pData, int index, bool wait) {

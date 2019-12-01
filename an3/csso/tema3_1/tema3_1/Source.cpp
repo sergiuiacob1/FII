@@ -34,7 +34,7 @@ void generateNumbers(HANDLE handle) {
 	float half;
 
 	// creez evenimentul pentru scriere in MappedFile
-	printf("P1 - Creating handle for event\n");
+	printf("P1 - Creating handles for write and check events\n");
 	HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, "access_mapped_file");
 	HANDLE hCheckEvent = CreateEvent(NULL, FALSE, FALSE, "check_event");
 
@@ -42,7 +42,6 @@ void generateNumbers(HANDLE handle) {
 	writeToMappedFile(pData, hEvent, (int)GetCurrentProcessId(), 1);
 
 	// scriu in mapped file cate numere am
-	howMany = 5;
 	printf("P1 - I have a total of %d numbers\n", howMany);
 	writeToMappedFile(pData, hEvent, howMany, 2);
 
