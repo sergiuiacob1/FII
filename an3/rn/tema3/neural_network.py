@@ -81,12 +81,13 @@ class NeuralNetwork(object):
                 x, y, p_dropout)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+            momentum_nabla_b = np.multiply(
+                momentum_nabla_b, beta_momentum) - np.multiply(nabla_b, eta/len(mini_batch))
+            momentum_nabla_w = np.multiply(
+                momentum_nabla_w, beta_momentum) - np.multiply(nabla_w, eta/len(mini_batch))
 
         # Momentum + L2 regularization
-        momentum_nabla_b = np.multiply(
-            momentum_nabla_b, beta_momentum) - np.multiply(nabla_b, eta/len(mini_batch))
-        momentum_nabla_w = np.multiply(
-            momentum_nabla_w, beta_momentum) - np.multiply(nabla_w, eta/len(mini_batch))
+
         regularization_value = (
             1 - eta * regularization_parameter / training_data_length)
         self.weights = [regularization_value * w + vw for w,

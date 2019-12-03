@@ -72,10 +72,9 @@ def main():
     # 18 a depasit 95%
     # la fel si 20
 
-    model.fit(training_data=train_data, test_data=test_data, **parameters)
     no = 20
+    # model.fit(training_data=train_data, test_data=test_data, **parameters)
     save_results(model, f"model_{no}.pkl", parameters)
-
     for i in range(1, no + 1):
         model = get_saved_results(f"model_{i}.pkl")
         show_plots(model, i)
