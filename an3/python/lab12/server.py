@@ -23,14 +23,14 @@ def handle_client(connection, address):
     d, cheie = total_data.rsplit('}')
     d += '}'
     d = ast.literal_eval(d)
-    print (f'The dictionary is: {d}')
-    print (f'The key is: {cheie}')
+    print(f'The dictionary is: {d}')
+    print(f'The key is: {cheie}')
     if cheie in d:
         connection.send(str(d[cheie]).encode("UTF-8"))
     else:
         connection.send(b'Key not found in dictionary')
 
-    print ('Connection done\n')
+    print('Connection done\n')
     connection.close()
 
 

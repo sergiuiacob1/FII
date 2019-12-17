@@ -10,10 +10,11 @@ suma = 0
 try:
     while True:
         data = connection.recv(10).decode("UTF-8")
-        print (f'Received data: {data}')
+        print(f'Received data: {data}')
         numbers = data.split('|')
         if len(numbers) > 0:
-            numbers = [int(x) for x in data.split('|') if x is not '.' and len(x) > 0]
+            numbers = [int(x) for x in data.split(
+                '|') if x is not '.' and len(x) > 0]
         suma += sum(numbers)
         if '.' in data:
             break
