@@ -12,8 +12,9 @@ def load_ontology():
 
 def find_class(onto, class_name):
     classes = list(onto.classes())
+    print(classes)
     for onto_class in classes:
-        if str(onto_class).endswith(class_name):
+        if class_name.lower() in str(onto_class).lower():
             return onto_class
     return None
 
