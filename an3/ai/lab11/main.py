@@ -17,6 +17,20 @@ def get_first_hypernym(word):
     return syns[0].hypernyms()[0].lemmas()[0].name()
 
 
+def get_distance_between_words(word1, word2):
+    first = wn.synsets(word1)
+    second = wn.synsets(word2)
+    if len(first) == 0:
+        # print(f'Could not find synsets for {word1}')
+        return None
+    if len(second) == 0:
+        # print(f'Could not find synsets for {word2}')
+        return None
+    first, second = first[0], second[0]
+    distance = first.shortest_path_distance(second)
+    return distance
+
+
 def calculate_distances(text):
     sentences = tokenize.sent_tokenize(text)
     distances = []
@@ -26,13 +40,11 @@ def calculate_distances(text):
         for word1, word2 in itertools.combinations(words, 2):
             if word1 == word2:
                 continue
-            try:
-                first = wn.synsets(word1)[0]
-                second = wn.synsets(word2)[0]
-                distance = first.shortest_path_distance(second)
-                max_distance = max(max_distance, distance)
-            except:
-                pass
+            distance = get_distance_between_words(word1, word2)
+            if distance is None:
+                print('Distance could not be found')
+                continue
+            max_distance = max(max_distance, distance)
         print(f'Distance found: {max_distance}')
         distances.append(max_distance)
 
