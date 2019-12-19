@@ -1,7 +1,7 @@
 import math
 import itertools
 import sys
-from nltk import tokenize
+from nltk import tokenize, word_tokenize, pos_tag
 if True:
     print('Loading Wordnet...')
     from nltk.corpus import wordnet as wn
@@ -26,7 +26,7 @@ def get_distance_between_words(word1, word2):
     if len(second) == 0:
         # print(f'Could not find synsets for {word2}')
         return None
-    first, second = first[0], second[0]
+    first, second = first[0].lemmas()[0], second[0].lemmas()[0]
     distance = first.shortest_path_distance(second)
     return distance
 
@@ -42,7 +42,7 @@ def calculate_distances(text):
                 continue
             distance = get_distance_between_words(word1, word2)
             if distance is None:
-                print('Distance could not be found')
+                # print('Distance could not be found')
                 continue
             max_distance = max(max_distance, distance)
         print(f'Distance found: {max_distance}')
@@ -57,13 +57,27 @@ def calculate_distances(text):
 
 def replace_nouns_with_hypernyms(text):
     result = ''
-    for word in text.split():
-        hypernym = get_first_hypernym(word)
-        if hypernym is not None:
-            print(f'Replaced {word} with {hypernym}')
-            result += ' ' + hypernym
+    tokens = word_tokenize(text)
+    parts_of_speech = pos_tag(tokens)
+    for x in parts_of_speech:
+        if x[1].startswith('NN'):
+            hypernym = get_first_hypernym(x[0])
+            if hypernym is not None:
+                print(f'Replaced {x[0]} with {hypernym}')
+                result += ' ' + hypernym
+            else:
+                result += ' ' + x[0]
         else:
-            result += ' ' + word
+            result += ' ' + x[0]
+    return result
+
+    # for word in text.split():
+    #     hypernym = get_first_hypernym(word)
+    #     if hypernym is not None:
+    #         print(f'Replaced {word} with {hypernym}')
+    #         result += ' ' + hypernym
+    #     else:
+    #         result += ' ' + word
     return result.strip()
 
 
