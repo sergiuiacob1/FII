@@ -14,7 +14,6 @@ PSECURITY_DESCRIPTOR createSecurityDescriptor();
 DWORD createRegExKey(SECURITY_ATTRIBUTES&);
 
 HKEY hKey;
-const char* regPath = "Software\\CSSO\\Tema5";
 
 int main()
 {
@@ -64,14 +63,14 @@ PSECURITY_DESCRIPTOR createSecurityDescriptor() {
 	//memset(currentUserSid, 0, dwSidSize);
 
 	DWORD dwSIDSize = SECURITY_MAX_SID_SIZE;
-	PSID adminSID = (PSID) new BYTE[dwSIDSize];
+	PSID creatorGroupSID = (PSID) new BYTE[dwSIDSize];
 	PSID publicSID = (PSID) new BYTE[dwSIDSize];
 
 	PSECURITY_DESCRIPTOR securityDescriptor = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
 	if (!InitializeSecurityDescriptor(securityDescriptor, SECURITY_DESCRIPTOR_REVISION))
 		throw "InitializeSecurityDescriptor failed";
 
-	if (!CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, adminSID, &dwSIDSize)) {
+	if (!CreateWellKnownSid(WinCreatorGroupSid, NULL, creatorGroupSID, &dwSIDSize)) {
 		printf("CreateWellKnownSid1 failed: %d\n", GetLastError());
 		return NULL;
 	}
@@ -80,47 +79,46 @@ PSECURITY_DESCRIPTOR createSecurityDescriptor() {
 		return NULL;
 	}
 
-	/*if (!SetSecurityDescriptorOwner(securityDescriptor, &adminSID, FALSE)) {
-		printf("SetSecurityDescriptorOwner failed: %d\n", GetLastError());
-		return NULL;
-	}
 
-	if (!SetSecurityDescriptorGroup(securityDescriptor, &publicSID, FALSE)) {
-		printf("SetSecurityDescriptorOwner failed: %d\n", GetLastError());
-		return NULL;
-	}*/
+	EXPLICIT_ACCESS explicitAccess[2];
+	memset(explicitAccess, 0, sizeof(explicitAccess));
 
+	explicitAccess[0].grfAccessPermissions = KEY_ALL_ACCESS;
+	explicitAccess[0].grfAccessMode = SET_ACCESS;
+	explicitAccess[0].grfInheritance = NO_INHERITANCE;
+	explicitAccess[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+	explicitAccess[0].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+	explicitAccess[0].Trustee.ptstrName = (LPTSTR)creatorGroupSID;
 
-	EXPLICIT_ACCESS ea[2];
-	memset(ea, 0, sizeof(ea));
-
-	ea[0].grfAccessPermissions = KEY_ALL_ACCESS;
-	ea[0].grfAccessMode = SET_ACCESS;
-	ea[0].grfInheritance = NO_INHERITANCE;
-	ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
-	ea[0].Trustee.TrusteeType = TRUSTEE_IS_GROUP;
-	ea[0].Trustee.ptstrName = (LPTSTR)adminSID;
-
-	ea[1].grfAccessPermissions = KEY_READ;
-	ea[1].grfAccessMode = SET_ACCESS;
-	ea[1].grfInheritance = NO_INHERITANCE;
-	ea[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
-	ea[1].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-	ea[1].Trustee.ptstrName = (LPTSTR)publicSID;
+	explicitAccess[1].grfAccessPermissions = KEY_READ;
+	explicitAccess[1].grfAccessMode = SET_ACCESS;
+	explicitAccess[1].grfInheritance = NO_INHERITANCE;
+	explicitAccess[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+	explicitAccess[1].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+	explicitAccess[1].Trustee.ptstrName = (LPTSTR)publicSID;
 
 	PACL pAcl = NULL;
-	DWORD result = SetEntriesInAcl(2, ea, NULL, &pAcl);
-	if (result != ERROR_SUCCESS) {
+	DWORD result = SetEntriesInAcl(2, explicitAccess, NULL, &pAcl);
+	if (result) {
 		printf("SetEntriesInAcl failed: %d\n", result);
 		return NULL;
 	}
 
-	//SET DACL
 	if (!SetSecurityDescriptorDacl(securityDescriptor, TRUE, pAcl, FALSE)) {
 		printf("SetSecurityDescriptorDacl failed: %d\n", GetLastError());
 		return 0;
 	}
 
+
+	/*if (!SetSecurityDescriptorOwner(securityDescriptor, &creatorGroupSID, FALSE)) {
+		printf("SetSecurityDescriptorOwner failed: %d\n", GetLastError());
+		return NULL;
+	}
+	/*
+	if (!SetSecurityDescriptorGroup(securityDescriptor, &creatorGroupSID, FALSE)) {
+		printf("SetSecurityDescriptorOwner failed: %d\n", GetLastError());
+		return NULL;
+	}*/
 
 	/*if (!GetUserName(currentUserName, &currentUserNameLength)) {
 		printf("GetUserName failed: %d\n", GetLastError());
@@ -157,11 +155,11 @@ DWORD createRegExKey(SECURITY_ATTRIBUTES& securityAttributes) {
 	DWORD disposition = 0;
 	return RegCreateKeyEx(
 		HKEY_CURRENT_USER,
-		regPath,
+		LPCSTR("Software\\CSSO"),
 		0,
 		NULL,
 		REG_OPTION_NON_VOLATILE,
-		KEY_READ,
+		KEY_WOW64_32KEY && KEY_ALL_ACCESS,
 		&securityAttributes,
 		&hKey,
 		&disposition);
