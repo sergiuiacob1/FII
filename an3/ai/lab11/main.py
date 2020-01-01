@@ -1,90 +1,89 @@
-import math
-import itertools
-import sys
-from nltk import tokenize, word_tokenize, pos_tag
-if True:
-    print('Loading Wordnet...')
-    from nltk.corpus import wordnet as wn
-    print('Wordnet Loaded!')
+from sklearn import cluster, metrics
+from gensim.models.word2vec import Word2Vec
+from gensim.summarization.textcleaner import get_sentences, split_sentences
+import pandas as pd
+import nltk
+from nltk.cluster import KMeansClusterer
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 
 
-def get_first_hypernym(word):
-    syns = wn.synsets(word, pos=wn.NOUN)
-    if len(syns) == 0:
-        return None
-    if len(syns[0].hypernyms()) == 0:
-        return syns[0].lemmas()[0].name()
-    return syns[0].hypernyms()[0].lemmas()[0].name()
+print('Done importing libraries')
 
 
-def get_distance_between_words(word1, word2):
-    first = wn.synsets(word1)
-    second = wn.synsets(word2)
-    if len(first) == 0:
-        # print(f'Could not find synsets for {word1}')
-        return None
-    if len(second) == 0:
-        # print(f'Could not find synsets for {word2}')
-        return None
-    first, second = first[0].lemmas()[0], second[0].lemmas()[0]
-    distance = first.shortest_path_distance(second)
-    return distance
+def tsne_plot(model):
+    "Creates and TSNE model and plots it"
+    labels = []
+    tokens = []
+
+    for word in model.wv.vocab:
+        tokens.append(model.wv[word])
+        labels.append(word)
+
+    tsne_model = TSNE(perplexity=40, n_components=2,
+                      init='pca', n_iter=250, random_state=23, verbose=True)
+    print('Starting TNSE')
+    new_values = tsne_model.fit_transform(tokens)
+    print('TNSE done')
+
+    x = []
+    y = []
+    for value in new_values:
+        x.append(value[0])
+        y.append(value[1])
+
+    plt.figure(figsize=(16, 16))
+    for i in range(len(x)):
+        plt.scatter(x[i], y[i])
+        plt.annotate(labels[i],
+                     xy=(x[i], y[i]),
+                     xytext=(5, 2),
+                     textcoords='offset points',
+                     ha='right',
+                     va='bottom')
+    plt.show()
 
 
-def calculate_distances(text):
-    sentences = tokenize.sent_tokenize(text)
-    distances = []
-    for sentence in sentences:
-        words = sentence.split()
-        max_distance = -1
-        for word1, word2 in itertools.combinations(words, 2):
-            if word1 == word2:
-                continue
-            distance = get_distance_between_words(word1, word2)
-            if distance is None:
-                # print('Distance could not be found')
-                continue
-            max_distance = max(max_distance, distance)
-        print(f'Distance found: {max_distance}')
-        distances.append(max_distance)
+def part1():
+    # Read data
+    file_path = "~/Downloads/dataset.csv"
+    data = pd.read_csv(file_path, encoding="ISO-8859-1")
 
-    result = ''
-    for x, y in zip(sentences, distances):
-        result += x
-        result += ' (' + str(y) + ') '
-    return result
+    # Getting sentences
+    # print ('Processing text')
+    # tok_corp = [nltk.word_tokenize(x) for x in data["SentimentText"].values.tolist()]
 
+    # print ('Training model')
+    # model = Word2Vec(sentences=tok_corp, workers=4)
+    # model.save("model.pkl")
 
-def replace_nouns_with_hypernyms(text):
-    result = ''
-    tokens = word_tokenize(text)
-    parts_of_speech = pos_tag(tokens)
-    for x in parts_of_speech:
-        if x[1].startswith('NN'):
-            hypernym = get_first_hypernym(x[0])
-            if hypernym is not None:
-                print(f'Replaced {x[0]} with {hypernym}')
-                result += ' ' + hypernym
-            else:
-                result += ' ' + x[0]
-        else:
-            result += ' ' + x[0]
-    return result
+    print('Loading model')
+    model = Word2Vec.load("model.pkl")
 
-    # for word in text.split():
-    #     hypernym = get_first_hypernym(word)
-    #     if hypernym is not None:
-    #         print(f'Replaced {word} with {hypernym}')
-    #         result += ' ' + hypernym
-    #     else:
-    #         result += ' ' + word
-    return result.strip()
+    words = ["awesome", "doubt", "marvelous", "brilliant", "model",
+             "thrilling", "fabulous", "super", "superb", "outstanding"]
+    print(model.wv.most_similar(positive=words))
+    tsne_plot(model)
+    print('Plot shown')
 
 
-if __name__ == '__main__':
-    file_path = sys.argv[1]
-    text = open(file_path, 'rt').read()
-    result = replace_nouns_with_hypernyms(text)
-    open(file_path, 'wt').write(result)
-    distances_result = calculate_distances(text)
-    open('distances.txt', 'wt').write(distances_result)
+def part2():
+    print('Loading model')
+    model = Word2Vec.load("model.pkl")
+    X = model.wv.vectors[:2000]
+    no_clusters = 5
+    kclusterer = KMeansClusterer(
+        no_clusters, distance=nltk.cluster.util.cosine_distance, repeats=5)
+    assigned_clusters = kclusterer.cluster(X, assign_clusters=True)
+
+    words = list(model.wv.vocab)[:2000]
+    filtered = [list()] * no_clusters
+    for index, word in enumerate(words):
+        filtered[assigned_clusters[index]].append(word)
+
+    print (filtered[0][:10])
+    # for i in range(0, no_clusters):
+        # print(filtered[i])
+
+
+part2()
