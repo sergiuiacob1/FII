@@ -1,0 +1,112 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2511
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww20760\viewh13260\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf0 curs1:\
+
+\f1\b0 	- tipuri de neuron (liniari, RELU, binary threshold, logistic)\
+\
+
+\f0\b curs2:\
+
+\f1\b0 	- online training, mini-batch, batch training\
+	- perceptron algorithm\
+	- adaline perceptron algorithm\
+	- diferenta dintre cele 2 de mai sus e in invatare; perceptron considera outputul neuronului ca fiind valoarea binara (0, 1, aka activat sau nu), iar adaline considera efectiv valoarea neuronului, inainte de a fi trecut prin threshold-ul binar\
+\
+
+\f0\b curs3:\
+
+\f1\b0 	- dc nu merge neuronul binary threshold (aka PERCEPTRONUL simplu) la feed forward: pt ca putem sa schimbam weight-urile si tot sa nu vedem schimbari la outputul functiei\
+	- la fel si la functia de cost, daca doar numaram corect/incorect in loc de un MSE\
+	- feed forward architecture, backpropagation\
+\
+
+\f0\b curs4:\
+
+\f1\b0 	- functii de eroare: MSE, Cross-Entropy\
+	- de ce nu e bun MSE: contine sigma\'92(z), care pt valori mari/mici variaza ft putin => neuronul invata greu; ne trebuie o functie de cost care sa nu contina sigma\'92(z) in atunci cand calculam eroarea unui neuron => Cross-Entropy\
+	- softmax: folosim Cross-Entropy, deci lucram cu probabilitati; asadar, in output layer trb sa avem probabilitati => polosim softmax (e^valoare / sum(valorile tuturor neuronilor de pe layerul L))\
+		- nu doar asta, dar sigmoidul e buna doar cand vrem sa facem clasificare BINARA; pt mai multe clase, probabilitatea ca instanta X sa fie o anumita clasa trebuie sa fie\'85 well, o probabilitate; hence softmax, ca ele insumate sa dea 1\
+	- weight initialization: daca toate w = 0, reteaua nu invata nimic; daca toate w = constanta, toate w se modifica in acelasi mod; metoda buna: initialzam un weight cu 1 / sqrt(cate_conexiuni_intra_in_el)\
+\
+
+\f0\b curs5:\
+
+\f1\b0 	- regularizare: penalizeaza weight-urile mari\
+	- dropout: dam sansa tuturor neuronilor sa invete\
+	- maxnorm: limitam weighturile, sa nu explodeze => putem folosi learning rate mai mare\
+
+\f0\b curs6:\
+
+\f1\b0 	- probleme ale SGD-ului: learning rate prea mic => converge prea incet; learning rate prea mare => \'93overshoots\'94 the target\
+		- putem folosi un learning rate decay, aka sa scadem learning rate-ul cu un epsilon (dupa fiecare update la weights, de exemplu), ca la inceput sa invete mai rapid, apoi sa convearga incet da\'92 sigur\
+		SAU\
+		- daca vedem ca reteaua evolueaza bine si constant, putem sa crestem learning rate-ul ca sa evolueze tot bine si constant, da mai rapid (hopefully)\
+		- daca nu prea evolueaza, atunci putem sa scadem learning rate-ul\
+	Optimizatori:\
+	- enter momentum: daca gradientii, de la o iteratie la alta, se indreapta cam in aceeasi directie => ma duc mai hotarat in directia respectiva (cu velocitate mai mare)\
+	- Nesterov Accelerated Gradient: tot un fel de momentum, dar se uita cu un pas in fata ca sa aproximeze mai bine pasul pe care ar trebui sa il ia. mai bun decat momentum simplu\
+	- RProp: tine cont doar de semnul gradientilor; semnul la iteratie x e la fel ca la iteratia x-1 => ma duc bine, deci ma duc mai hotarat; altfel, ma duc inapoi unde eram si iar fac update, dar un update mai precaut (schimbari mai mici); e bun ca sa iesi de pe platouri rapid (cum face si momentum)\
+		- RProp nu merge cu mini batch-uri; nu e bun pt seturi mari de date\
+	- Adagrad: daca am gradienti mari, le dau un learning rate mic si viceversa; cumva este cate un learning rate pt fiecare weight in parte\
+		- tine un istoric al gradientilor de la iteratiilor precendente\
+		- deci avantajeaza mult featurile care apar mai rar prin dataset (le da un learning rate mai mare)                     \
+		- din pacate se poate bloca in minimuri locale\
+	- RMSProp: construit peste Adagrad\
+		- in loc sa tina un istoric al gradientilor, tine un \'93exponential running average\'94 (tine cont de gradientii de la iteratie t-1 intr-o proportie de p, si de astia de la iteratia t intr-o proportie 1-p)\
+	- Adam: momentum and RMSProp had a baby\
+	- Adadelta: asemanator cu RMSProp, foloseste exponential running averages & mai e introdus un termen m\
+\
+
+\f0\b curs7:\
+	
+\f1\b0 - probleme la sigmoid: outputul intotdeauna pozitiv; se satureaza ft usor (sub/peste un anumit prag la input, da ~0); VANISHING GRADIENTS!!!\
+	- tanh: elimina problema cu outputul intotdeauna pozitiv, ia valori intre [-1, 1]\
+	- Relu Oncescu: most used; output = max (0, x); elimina problema de vanishing gradients\
+\
+	- Radial Basis Function Network: alt tip de retea; intra distributia gaussiana pe aici\
+		- tot ca un MLP, dar in hidden layers am neuroni (prototipuri) care reprezinta subseturi din setul meu de date\
+		- un prototip are ca output cam cat de similar e inputul cu subsetul pe care il reprezinta el, aka distanta dintre prototip si input\
+		- un prototip e reprezentat de centroidul lui, distanta poate fi BAZATA pe euclidiana de ex\
+		- outputul: weight each prototype\'92s similarity and classify the input\
+		- Antrenare: gasirea prototiprilor (unsupervised, poate fi un k-means de ex) si cum sa faci efectiv clasificarea, aka how to weight each prototype\'92s output\
+\
+
+\f0\b curs8:\
+	
+\f1\b0 - Markov Decision Process
+\f0\b \
+	
+\f1\b0 - discount factor: cat de importanta este o recompensa in viitor vs acum\
+	- \uc0\u960 (s): ne spune ce actiune ar trebui sa luam din actiunea s\
+	- Q(s, a) = R(s, a, s\'92) + discount * MAXa Q(x\'92, a\'92)\
+			current reward		   future reward\
+	- Monte carlo:\
+		- politica initiala \uc0\u960 , estimam valorile Q(s, a)\
+		- \uc0\u960 (s) = argmax a Q(s, a), unde Q(s, a) le calculam dupa formula de mai sus;\
+		dar noi nu stim MAXa Q(s\'92, a\'92), asa ca initializam toate Q(s, a) cu 0 si aplicam pasul de update cat timp (conditie)\
+\
+	- Q-Learning:\
+		- fac o actiune, vad ce reward am primit si apoi corectez vechea predictie\
+		- ec. Bellman: Q(s, a) = Q(s, a) + learning_rate * (R(s, a, s\'92) + discount_factor * MAX a Q(s\'92, a\'92) - Q(s, a))\
+		- explorare vs exploatare; din cand in cand, ne abatem de la politica optimala (facem explorare), ca sa dam sansa fiecarei actiuni sa ia parte la politica \uc0\u960 (s)	\
+	- Q(s, a) poate sa fie masiva, in functie de cate stari si actiuni avem\
+	- folosim RN ca sa aproximam Q(s, a)\
+		- iau o actiune => feed forward\
+		- folosim experience replay ca sa antrenam reteaua: retinem cate mai multe experiente si le dam pe astea ca input la retea, sa invete\
+\
+
+\f0\b curs9:\
+	
+\f1\b0 - SOM (Self Organizing Map): o RN pentru vizualizarea datelor\
+		- neuronii sunt \'93asezati\'94 intr-o forma matriceala\
+		- antrenarea functioneaza ca un fel de K-Means, distanta poate fi distanta euclidiana\
+		- BMU (echivalentul unui centroid); mai are si un radius care se tot micsoreaza \
+		- fiecare unit o sa se adapteze ca sa semene mai mult cu instantele de antrenament x pt care BMU(x) = acest unit\
+		\
+\
+}
