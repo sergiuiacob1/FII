@@ -1,0 +1,176 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2511
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww23660\viewh13900\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 ce a dat la examen:\
+	- ce e VAD, HAL, MMU\
+	- ce masoara Thread % User Time\
+	- ce face PROCEXP.EXE, ce face Smss.exe\
+	- enumerati obiectele folosite de windows pentru sincronizare. pentru mutex, spuneti cum se semnalizeaza, cum se desemnalizeaza si ce se intampla atunci cand este semnalizat\
+	- ce se intampla la nivel de procesor atunci cand se schimba contextul intre doua procese/thread-uri\
+	- handle = CreateFileMapping()\'85 descrieti ce se intampla cand se ruleaza linia asta de cod\
+	- descrieti PCB, TCB\
+	- despre TLB (translation look-aside buffer)\
+	- NTFS: ce e un cluster, un sector, metadata, ce sunt paginile de memorie (parca) Free, Zero Memory, Standby, Modified\
+	- descrieti MFT (Master File Table)\
+	- ce se intampla la un hardware interrupt\
+\
+\
+
+\f1\b din Capitolul 1:
+\f0\b0 \
+	- Kernel, Executive, HAL, GDI\
+	- ce e IPC (posibil sa fie cap 2, nustiu)\
+	- ce e un Environment System\
+\
+
+\f1\b din Capitolul 2:\
+
+\f0\b0 	- ce e un Object\
+	- ce e un Handle Table si ce e un Handle de fapt (index in Handle Table), fiecare Handle Table e privat per proces; contine adrese in system-memory pt data-structures\
+	- object manager (capitolul 2)\
+	- CSRSS.exe (capitolul 2)\
+	- ce e LPC\
+	- ce e IPC\
+	- Wow64: permite rularea binarelor Win32 pe 64bit\
+\
+
+\f1\b din Capitolul 3:\
+
+\f0\b0 	- Kernel mode vs User mode: stari ale procesorului; fiecare pagina de memorie este taguita ca sa spuna ce privilegii sunt necesare pt a o citi/scrie => protejarea sistemului/userului de user\
+	- Control flow: un thread trece din kernel->user->kernel mode fara a afecta scheduling-ul\
+	- Rulam in Kernel mode cand:\
+		- userul cere (ex. face system calls)\
+		- exista intreruperi de la dispozitive externe\
+		- unele thread-uri ruleaza in kernel mode constant (ex. alea de sistem, System threads)\
+	- ce e ISR (Interrupt Service Routines) care sunt intr-un Vector Table si sunt folosite de Interrupt Service Handler; cand primeste cpu-ul un semnal din exterior, salveaza contextul curent (registri, cod etc) si executa acel handler apoi revine la contextul anterior, isi reia executia\
+	- Dispatcher: spune cui thread ii da acces la CPU ca sa ruleze		- Dispatcher object: any kernel object you can wait for (ex. events, mutexes etc)\
+	- ce e DPC? (Deferred Procedure Calls)\
+\
+
+\f1\b Capitolul 4:\
+	
+\f0\b0 - Thread: init, ready, running, waiting (cand asteapta un event sau i-a expirat cuanta de timp), terminated)\
+	- PCB (Process Control Block): contine informatii despre proces\
+	- TCB (Thread Control Block): contine informatii despre thread\
+	- cand facem switch intre thread-urile care ruleaza, starea lor e salvata intr-un TCB\
+	- Ready queue: cozi cu threadurile in asteptare\
+	- Device queue: cozi cu threaduri care asteapta device-uri I/O\
+	- job scheduler: selecteaza procesele care sa vina in ready queue\
+	- cpu scheduler: selecteaza threadurile care sa fie executate in continuare\
+	- Dispatcher: da unui thread control asupra CPU-ului\
+	- Scheduling algorithms (adica cum ii pun in waiting queue, cum le fac dispatch): FIFO, Round Robin\
+	- Round Robin:\
+		- un fel de FIFO, doar ca impart tot waiting queue-ul in bucati (time quantums) si fiecare thread ruleaza pt acel time quantim, apoi urmatorul (in ordinea FIFO) s.a.m.d.\
+	- Priority Scheduling:\
+		- fiecare thread mai are o prioritate; CPU-ul e dat aluia cu prioritate maxima => poate aparea Starvation (low priority threads may never execute)\
+		- solutii: descreste prioritatea threadurilor CPU-intensive, creste prioritatea cu un burst pt threadurile care asteapta prea mult\
+	- Multilevel Queue Scheduling\
+		- ready queue e partitionata in mai multe cozi, ex Real-Time si Interactive\
+		- scheduling-ul se face \'93intre\'94 cozi; nu putem secvential (prima data threaduri din prima, apoi din a doua), ca ar aparea starvation; folosim time slices - fiecare coada are un anumit timp de CPU pe care si-l imparte intre threaduri\
+	Cum sunt mapate user threads la kernel threads:\
+		- Many to one\
+		- One to One\
+		- Many to Many\
+	- un proces sau un thread sunt identificate printr-un client id (process id, respectiv thread id)\
+	- Job: colectie de procese\
+		- specifica limite de CPU, memorie, securitate\
+		- specifica prioritatea threadurilor, pe ce CPU-uri pot sa ruleze threadurile, ce pot face procesele (daca pot sa ceara drepturi de administrator) etc\
+	Flow of CreateProcess():\
+		- open .EXE image file that needs to be executed inside the process\
+		- create Windows NT EPROCESS (Executive Process Object) - NtCreateProcess\
+		- create initial thread - stack, context, Windows NT ETHREAD - NtCreateThread\
+		- notify Windows subsystem (CSRSS.EXE) of new process\
+		- start initial thread\
+		- in context of new process/thread: initialize addres space (load DLLs)\
+		- execute program\
+	Scheduling:\
+	- Throughput = cate threaduri isi termina treaba per time unit\
+	- Threads with the same priority are scheduled using Round-Robin\
+	- Prioritatile: de la 0 la 31 (Idle, lowest, below normal, normal, above normal, highest, time_criticall (sau realtime)); [16, 31] sunt realtime levels\
+	- THREADS ARE SCHEDULED, NOT PROCESSES!\
+	- Idle threads: ruleaza doar cand nimic altceva nu vrea sa ruleze\
+	- prioritatile astea de scheduling pt threaduri, [0, 31], vin la partea de Software Interrupts din Interrupt Request Levels (IRQLs)\
+	- fiecare priority level are un FIFO\
+	- nu exista un \'93central scheduler\'94 sau cod pt scheduling care e executat; cand e nevoie, e un event, o ceva, pur si simplu se apeleaza o rutina de scheduling\
+	Scenarii de scheduling:\
+		- preemption: un thread cu prioritate mai mare decat asta care ruleaza acuma devine ready; incepe sa ruleze asta ready si alalaltu se duce in CAPUL listei de ready\
+		- normal: unu cu prioritate mai mica devine ready; se duce la capatul listei\
+		- voluntary switch: asta care ruleaza nu mai are treaba cu CPU-ul; vine urmatoru\
+		- quantum end: i s-a terminat timpu astuia care ruleaza;  se duce inapoi la coada si vine urmatoru\
+	- boosting: de ex daca avem un thread care e I/O intensive si asteapta un event I/O care s-a terminat\'85 primeste un boost de prioritate; tot scade pana la ala precedent pe masura ce trec cuantele de timp\
+		
+\f1\b - NU POATE DEPASI PRIORITY 15
+\f0\b0 \
+	- quantum streching: daca procesul ruleaza in foreground, threadurile lui pot primi o cuanta mai mare\
+	- exista un proces care se asigura ca nu sunt threaduri aflate in starvation; daca de ex un thread asteapta pe altu care nu poate rula pt ca are prioritate prea mica, ii da un boost de prioritate \
+	- afinitate = cpu-ul pe care preferera procesul/threadul sa ruleze\
+	- cand se alege pe care CPU sa ruleze un thread: ne uitam la thread\'92s affinity mask\
+\
+\
+\
+CAP5:\
+	- logical (virtual) vs physical memory; maparea, translatarea de la virtual la fizic este facuta de Memory Management Unit (MMU)\
+	- tipuri de alocare: First-fit (prima), Best-fit (cea mai mica care e ok), Worst-fit (cea mai mare)\
+	- programul e prea mare si nu incape in memorie: il spargem in module si incarcam modulele alternativ\
+	- swapping: un proces este scos din memorie si salvat altundeva iar un altul ii ia locul; apoi invers\
+	- fiecare proces are niste limite; de unde pana unde poate accesa memorie\
+	- segmentation: userul vede memoria ca perechi (segment number, offset)\
+	- fragmentation: memoria libera poate fi imprastiata\
+	- paging: memoria este paginata, sparta in bucatele\
+	- verificarea daca accesul memoriei e legit se face pe partea de hardware\
+	- Data Execution Prevention (DEP): protects user and kernel stacks, paged pool, session pool\
+	- application always references \'93virtual addresses\'94\
+	BAGAMEAS PULA DE CE-S ASA DE MULTE\
+	- each process has a single page 
+\f1\b directory 
+\f0\b0 and a private set of page tables\
+	- working set: toate paginile pe care un proces le detine, pe care le poate accesa fara erori\
+\
+
+\f1\b cap6:\
+	
+\f0\b0 - every thread starting an I/O operation should block until I/O has completed and interrupt occurs\
+	- device driver: contains all device-dependent code\
+	- I/O Manager: framework responsabil de IRPs (I/O Request Packets)\
+	- HAL: provides APIs that hide differences between platforms\
+	- PnP: Plug&Play, handles device driver loading & starting\
+\
+
+\f1\b cap7:\
+	
+\f0\b0 - LSA (Local Security Authority): heart of user authentication\
+	- SRM (Security Reference Monitor): heart of object access protection\
+	- Tokens\
+		- SID of the user & of groups the user belongs to\
+		- privileges assigned to the user\
+	- Security Identifier\
+\
+\
+
+\f1\b Capitolul 8:\
+	
+\f0\b0 - NTFS: foloseste clusters pe 64 bits\
+		- NTFS imbunatateste FAT, pt ca FAT nu suporta large disks, large clusters, large memory\
+		- punne accent pe reliability\
+		- tranzactiile sunt ori completed ori rolled back\
+		- cluster size is adjustable\
+		- Cache Manager: system wide caching\
+	- CIFS: Common Internet File System; baza pt network file system\
+	- versiuni mai vechi de FAT (File Allocation Table) inca sunt supported, ca de ex sa poti sa faci update la sistem de pe versiunile mai vechi de Windows OS\
+	- Cu cat cluster size-ul e mai mare, cu atat defragmentarea e mai ok, dar avem mai mult spatiu irosit\
+	- Master File Table (MFT): all data stored in a volume is contained in a MFT\
+		- heart of the NTFS \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}

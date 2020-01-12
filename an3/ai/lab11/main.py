@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 print('Done importing libraries')
 
@@ -18,11 +19,13 @@ def tsne_plot(model):
     labels = []
     tokens = []
 
-    for word in model.wv.vocab:
+    no = 1000
+
+    for word in list(model.wv.vocab)[:no]:
         tokens.append(model.wv[word])
         labels.append(word)
 
-    tsne_model = TSNE(perplexity=5, n_components=2,
+    tsne_model = TSNE(perplexity=25, n_components=2,
                       init='pca', n_iter=250, random_state=23, verbose=True)
     print('Starting TNSE')
     new_values = tsne_model.fit_transform(tokens)
@@ -66,6 +69,10 @@ def part1():
 
     print('Loading model')
     model = Word2Vec.load("model.pkl")
+    tsne_plot(model)
+    print('Plot shown')
+
+    return
 
     words = ["awesome", "dog", "building", "movie", "red",
              "device", "sky", "plant", "dark", "operate"]
@@ -74,9 +81,6 @@ def part1():
     # words = ["awesome", "doubt", "marvelous", "brilliant", "model",
     #          "thrilling", "fabulous", "super", "superb", "outstanding"]
     # print(model.wv.most_similar(positive=words))
-
-    # tsne_plot(model)
-    # print('Plot shown')
 
 
 def extract_features(df):
@@ -89,31 +93,19 @@ def extract_features(df):
 def part2():
     # GET FEATURES
     data = get_data()
-    print ('Extracting features...')
+    print('Extracting features...')
     X, cv = extract_features(data)
     y = data["Sentiment"].values
 
-    print ('Training model...')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    print('Training model...')
     model = LogisticRegression()
-    model.fit(X, y)
-
-    print(f"Training data accuracy: {accuracy_score(y, model.predict(X))}")
-
-    # data = get_data()
-    # X = data["SentimentText"].values
-    # y = data["Sentiment"].values
-    # cv = CountVectorizer(binary=True)
-    # cv.fit(X)
-    # X = cv.transform(X)
-    # X_test = cv.transform(y)
-
-    # y = [1 if i < 12500 else 0 for i in range(25000)]
-
-    # final_model = LogisticRegression(C=0.05)
-    # final_model.fit(X, y)
-
-    # print("Training data accuracy: %s" %
-    #       accuracy_score(y, final_model.predict(X)))
+    model.fit(X_train, y_train)
+    print(
+        f"Training data accuracy: {accuracy_score(y_train, model.predict(X_train))}")
+    print(
+        f"Test data accuracy: {accuracy_score(y_test, model.predict(X_test))}")
 
     # print('Loading model')
     # model = Word2Vec.load("model.pkl")
